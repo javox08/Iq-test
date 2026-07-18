@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Test de CI | Mide tu coeficiente intelectual</title>
+<meta name="description" content="Test de coeficiente intelectual cronometrado con preguntas de lógica, matemáticas, patrones y razonamiento verbal.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🧠</text></svg>">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="bg-decor" aria-hidden="true"></div>
+
+<main class="app">
+
+  <!-- PANTALLA DE INICIO -->
+  <section id="screen-start" class="screen active">
+    <div class="card">
+      <div class="brain-icon">🧠</div>
+      <h1>Test de Coeficiente Intelectual</h1>
+      <p class="subtitle">20 preguntas · lógica, patrones, matemáticas y razonamiento verbal</p>
+
+      <div class="info-grid">
+        <div class="info-item">
+          <span class="info-num">20</span>
+          <span class="info-label">Preguntas</span>
+        </div>
+        <div class="info-item">
+          <span class="info-num">10:00</span>
+          <span class="info-label">Minutos</span>
+        </div>
+        <div class="info-item">
+          <span class="info-num">4</span>
+          <span class="info-label">Categorías</span>
+        </div>
+      </div>
+
+      <ul class="rules">
+        <li>Tienes <strong>10 minutos</strong> en total para completar el test.</li>
+        <li>Si el tiempo se agota, el test se enviará automáticamente con las respuestas dadas.</li>
+        <li>Cada pregunta tiene una única respuesta correcta.</li>
+        <li>Al finalizar verás tu puntuación y una estimación de CI orientativa.</li>
+      </ul>
+
+      <p class="disclaimer">
+        ⚠️ Este test es de carácter recreativo/orientativo. No es un instrumento clínico
+        ni sustituye una evaluación psicométrica profesional.
+      </p>
+
+      <input id="player-name" type="text" placeholder="Tu nombre (opcional)" maxlength="30" autocomplete="off">
+
+      <button id="btn-start" class="btn btn-primary">Comenzar test ▶</button>
+    </div>
+  </section>
+
+  <!-- PANTALLA DEL TEST -->
+  <section id="screen-quiz" class="screen">
+    <div class="quiz-header">
+      <div class="progress-wrap">
+        <div class="progress-bar"><div id="progress-fill" class="progress-fill"></div></div>
+        <span id="progress-text" class="progress-text">Pregunta 1 / 20</span>
+      </div>
+      <div id="timer" class="timer">10:00</div>
+    </div>
+
+    <div class="card quiz-card">
+      <span id="q-category" class="badge">Lógica</span>
+      <h2 id="q-text" class="q-text">Pregunta</h2>
+      <div id="q-options" class="options"></div>
+    </div>
+
+    <div class="quiz-nav">
+      <button id="btn-prev" class="btn btn-ghost">◀ Anterior</button>
+      <button id="btn-next" class="btn btn-primary">Siguiente ▶</button>
+      <button id="btn-finish" class="btn btn-success hidden">Finalizar test ✔</button>
+    </div>
+  </section>
+
+  <!-- PANTALLA DE RESULTADOS -->
+  <section id="screen-result" class="screen">
+    <div class="card result-card">
+      <div class="result-icon">🎯</div>
+      <h1>¡Test completado!</h1>
+      <p id="result-name" class="subtitle"></p>
+
+      <div class="iq-score-wrap">
+        <div class="iq-score" id="iq-score">100</div>
+        <div class="iq-label">Estimación de CI</div>
+        <div id="iq-tier" class="iq-tier">Promedio</div>
+      </div>
+
+      <div class="info-grid">
+        <div class="info-item">
+          <span id="stat-correct" class="info-num">0/20</span>
+          <span class="info-label">Aciertos</span>
+        </div>
+        <div class="info-item">
+          <span id="stat-time" class="info-num">0:00</span>
+          <span class="info-label">Tiempo usado</span>
+        </div>
+        <div class="info-item">
+          <span id="stat-percent" class="info-num">0%</span>
+          <span class="info-label">Precisión</span>
+        </div>
+      </div>
+
+      <h3 class="breakdown-title">Resultado por categoría</h3>
+      <div id="category-breakdown" class="breakdown"></div>
+
+      <p class="disclaimer">
+        ⚠️ Recuerda: esta puntuación es orientativa y con fines de entretenimiento,
+        no constituye un diagnóstico ni una medición psicométrica certificada.
+      </p>
+
+      <div class="result-actions">
+        <button id="btn-review" class="btn btn-ghost">Ver respuestas</button>
+        <button id="btn-restart" class="btn btn-primary">Repetir test 🔁</button>
+      </div>
+
+      <div id="review-wrap" class="review-wrap hidden"></div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">Hecho con 🧠 · Test de CI recreativo</footer>
+
+<script src="script.js"></script>
+</body>
+</html>
