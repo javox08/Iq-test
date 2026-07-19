@@ -63,10 +63,14 @@
    */
   const SPEED = {
     fullCreditRatio: 0.4,      // usar <=40% del tiempo = crédito máximo de velocidad
-    iqBonusMax: 10,            // puntos de CI que puede aportar la rapidez
+    iqBonusMax: 15,            // puntos de CI que puede aportar la rapidez (techo 160)
     concentrationBonusMax: 15, // el test de atención es de velocidad: pesa más
     carelessSecondsPerItem: 2  // <2 s/ítem en escalas = posible respuesta poco reflexiva
   };
+
+  // Interruptor del envío por correo. Se pone en true cuando haya un dominio
+  // verificado en Resend (avisar al usuario). Con false solo se ofrece descargar.
+  const EMAIL_ENABLED = false;
 
   // Factor de velocidad 0..1 (1 = muy rápido, 0 = usó todo el tiempo).
   function speedFactor(timeUsed, timeLimit) {
@@ -181,7 +185,8 @@
           category: q.category,
           text: q.text,
           options: shuffled.map((o) => o.text),
-          correct: shuffled.findIndex((o) => o.correct)
+          correct: shuffled.findIndex((o) => o.correct),
+          explanation: q.explanation || ''
         };
       });
     }
@@ -283,13 +288,17 @@
 
   /* ---------------- CÁLCULO DE RESULTADOS ---------------- */
 
+  // Bandas de clasificación de la escala Wechsler (media 100, desviación 15).
   function iqTier(iq) {
-    if (iq < 85) return { label: 'Por debajo del promedio', level: 'low' };
-    if (iq < 95) return { label: 'Promedio bajo', level: 'mid-low' };
-    if (iq < 105) return { label: 'Promedio', level: 'mid' };
-    if (iq < 115) return { label: 'Promedio alto', level: 'mid-high' };
-    if (iq < 130) return { label: 'Superior', level: 'high' };
-    return { label: 'Muy superior', level: 'high' };
+    if (iq < 70) return { label: 'Muy bajo', level: 'low' };
+    if (iq < 85) return { label: 'Límite', level: 'low' };
+    if (iq < 90) return { label: 'Promedio bajo', level: 'mid-low' };
+    if (iq < 110) return { label: 'Promedio', level: 'mid' };
+    if (iq < 120) return { label: 'Promedio alto', level: 'mid-high' };
+    if (iq < 130) return { label: 'Superior', level: 'mid-high' };
+    if (iq < 145) return { label: 'Muy superior', level: 'high' };
+    if (iq < 160) return { label: 'Superdotado', level: 'high' };
+    return { label: 'Superdotado excepcional', level: 'high' };
   }
 
   function computeQuiz(t, questions, answers, timeUsed) {
@@ -315,16 +324,17 @@
 
     let headline, headlineLabel, tier, message, speedInfo;
     if (t.scoring === 'iq') {
-      // Acierto -> 55..135 (componente "potencia"); velocidad -> hasta +10 (bonus).
-      const baseIQ = 55 + percent * 80;
+      // Acierto -> 40..145 (componente "potencia"); velocidad -> hasta +15 (bonus).
+      // Rango 40-160 = escala Wechsler (media 100, desviación 15).
+      const baseIQ = 40 + percent * 105;
       const bonus = SPEED.iqBonusMax * speed * percent;
       const bonusPts = Math.round(bonus);
       let iq = Math.round(baseIQ + bonus);
-      iq = Math.max(55, Math.min(145, iq));
+      iq = Math.max(40, Math.min(160, iq));
       headline = String(iq);
       headlineLabel = 'Estimación de CI';
       tier = iqTier(iq);
-      message = `Has acertado ${correctCount} de ${questions.length}. La rapidez te ha sumado +${bonusPts} puntos de CI (la velocidad mental correlaciona con la inteligencia en la investigación). Estimación orientativa.`;
+      message = `Has acertado ${correctCount} de ${questions.length}. La rapidez te ha sumado +${bonusPts} puntos de CI (la velocidad mental correlaciona con la inteligencia en la investigación). Estimación orientativa (escala 40-160).`;
       speedInfo = {
         label: speedLabel(speed),
         detail: `${formatTime(timeUsed)} de ${formatTime(t.timeLimit)} · +${bonusPts} pts por velocidad`
@@ -355,7 +365,8 @@
         text: q.text,
         userText: u === null ? 'Sin responder' : `${letters[u]}) ${q.options[u]}`,
         correctText: `${letters[q.correct]}) ${q.options[q.correct]}`,
-        isCorrect: u === q.correct
+        isCorrect: u === q.correct,
+        explanation: q.explanation || ''
       };
     });
 
@@ -540,7 +551,8 @@
         item.innerHTML = `
           <div class="review-q">${i + 1}. ${esc(rv.text)}</div>
           <div class="review-answer ${rv.isCorrect ? 'review-correct' : 'review-wrong'}">Tu respuesta: ${esc(rv.userText)}</div>
-          ${rv.isCorrect ? '' : `<div class="review-answer review-correct">Correcta: ${esc(rv.correctText)}</div>`}`;
+          ${rv.isCorrect ? '' : `<div class="review-answer review-correct">Correcta: ${esc(rv.correctText)}</div>`}
+          ${!rv.isCorrect && rv.explanation ? `<div class="review-why">💡 ${esc(rv.explanation)}</div>` : ''}`;
         reviewWrap.appendChild(item);
       });
     } else {
@@ -625,6 +637,10 @@
         <span class="report-row-score">${esc(r.headline)}</span>`;
       summary.appendChild(row);
     });
+    // El envío por correo se muestra solo si está habilitado (requiere dominio
+    // verificado en Resend); mientras tanto queda la descarga del informe.
+    $('report-email-block').classList.toggle('hidden', !EMAIL_ENABLED);
+
     $('report-status').textContent = '';
     $('report-status').className = 'report-status';
     $('report-modal').classList.remove('hidden');
