@@ -580,6 +580,39 @@ h1 {
   margin: 6px 0 4px;
 }
 
+.speed-line {
+  text-align: center;
+  font-size: 0.85rem;
+  color: var(--text-dim);
+  background: rgba(34, 211, 238, 0.08);
+  border: 1px solid rgba(34, 211, 238, 0.25);
+  border-radius: 999px;
+  padding: 8px 14px;
+  margin: 0 0 14px;
+}
+.speed-line strong { color: var(--accent-2); }
+
+.method {
+  font-size: 0.82rem;
+  color: var(--text-dim);
+  background: var(--bg-2);
+  border: 1px solid var(--card-border);
+  border-radius: 12px;
+  padding: 4px 14px;
+  margin: 14px 0;
+}
+.method summary {
+  cursor: pointer;
+  padding: 10px 0;
+  font-weight: 600;
+  color: var(--text);
+  list-style: none;
+}
+.method summary::-webkit-details-marker { display: none; }
+.method summary::before { content: 'ℹ️ '; }
+.method[open] summary { border-bottom: 1px solid var(--card-border); margin-bottom: 8px; }
+.method p { line-height: 1.55; margin: 8px 0; }
+
 /* ---- MODAL INFORME ---- */
 
 .modal {

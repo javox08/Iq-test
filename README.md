@@ -97,4 +97,10 @@ vacío, output `/`. En ese modo la carpeta `functions/` se enruta sola y `worker
   (`quiz` o `scale`), `timeLimit` (segundos), `pick` (cuántas preguntas mostrar) y su `pool`.
 - **Cambiar cuántas preguntas salen:** ajusta `pick` (debe ser ≤ tamaño del `pool`).
 - **Tiempo de un test:** ajusta `timeLimit`.
-- La estimación de CI es un mapeo lineal orientativo (55–145 según % de aciertos).
+- **El tiempo afecta al resultado** (basado en la investigación sobre velocidad mental):
+  - En tests de capacidad (CI, atención) la rapidez suma un bonus acotado, siempre
+    multiplicado por los aciertos: CI = `55 + aciertos·80 + (bonus ≤10)·rapidez·aciertos`
+    (Jensen 2006; Deary, Der & Ford 2001; Sheppard & Vernon 2008; bonus por rapidez tipo WAIS).
+  - En tests de personalidad el tiempo NO altera el perfil; se muestra como indicador de
+    calidad (respuestas <2 s/ítem = posible respuesta poco reflexiva, Huang et al. 2012).
+  - Ajusta los pesos en la constante `SPEED` de `script.js`.

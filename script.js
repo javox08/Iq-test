@@ -50,6 +50,37 @@
     ));
   }
 
+  /*
+   * Ajuste por tiempo, basado en la investigación sobre velocidad mental:
+   * - En tests de CAPACIDAD (CI, atención) la velocidad de respuesta correlaciona
+   *   con la inteligencia (r ≈ 0,3-0,4): Jensen (2006) "Clocking the Mind";
+   *   Deary, Der & Ford (2001); Sheppard & Vernon (2008). Los tests reales tipo
+   *   Wechsler (WAIS) dan bonus por rapidez. Aquí el tiempo aporta un bonus
+   *   acotado, SIEMPRE multiplicado por el acierto (rápido pero mal no puntúa).
+   * - En tests de PERSONALIDAD el tiempo NO cambia el resultado (no hay base
+   *   científica); se usa como indicador de calidad: responder a <2 s por ítem
+   *   sugiere respuesta poco reflexiva (Huang et al., 2012).
+   */
+  const SPEED = {
+    fullCreditRatio: 0.4,      // usar <=40% del tiempo = crédito máximo de velocidad
+    iqBonusMax: 10,            // puntos de CI que puede aportar la rapidez
+    concentrationBonusMax: 15, // el test de atención es de velocidad: pesa más
+    carelessSecondsPerItem: 2  // <2 s/ítem en escalas = posible respuesta poco reflexiva
+  };
+
+  // Factor de velocidad 0..1 (1 = muy rápido, 0 = usó todo el tiempo).
+  function speedFactor(timeUsed, timeLimit) {
+    const ratio = Math.min(1, Math.max(0, timeUsed / timeLimit));
+    return Math.min(1, Math.max(0, (1 - ratio) / (1 - SPEED.fullCreditRatio)));
+  }
+
+  function speedLabel(speed) {
+    if (speed >= 0.8) return '⚡ Muy rápido';
+    if (speed >= 0.5) return '🚀 Rápido';
+    if (speed >= 0.25) return '⏱️ Ritmo medio';
+    return '🐢 Pausado';
+  }
+
   /* ---------------- PORTADA / HUB ---------------- */
 
   function renderHub() {
@@ -278,23 +309,42 @@
       label, value: `${d.correct}/${d.total}`, pct: Math.round((d.correct / d.total) * 100)
     }));
 
-    let headline, headlineLabel, tier, message;
+    // Componente de velocidad (0..1). La rapidez solo puntúa multiplicada por el
+    // acierto, de modo que responder rápido pero mal no aporta nada.
+    const speed = speedFactor(timeUsed, t.timeLimit);
+
+    let headline, headlineLabel, tier, message, speedInfo;
     if (t.scoring === 'iq') {
-      let iq = Math.round(55 + percent * 90);
+      // Acierto -> 55..135 (componente "potencia"); velocidad -> hasta +10 (bonus).
+      const baseIQ = 55 + percent * 80;
+      const bonus = SPEED.iqBonusMax * speed * percent;
+      const bonusPts = Math.round(bonus);
+      let iq = Math.round(baseIQ + bonus);
       iq = Math.max(55, Math.min(145, iq));
       headline = String(iq);
       headlineLabel = 'Estimación de CI';
       tier = iqTier(iq);
-      message = `Has acertado ${correctCount} de ${questions.length} preguntas. Recuerda que la estimación de CI es orientativa.`;
+      message = `Has acertado ${correctCount} de ${questions.length}. La rapidez te ha sumado +${bonusPts} puntos de CI (la velocidad mental correlaciona con la inteligencia en la investigación). Estimación orientativa.`;
+      speedInfo = {
+        label: speedLabel(speed),
+        detail: `${formatTime(timeUsed)} de ${formatTime(t.timeLimit)} · +${bonusPts} pts por velocidad`
+      };
     } else {
-      const pts = Math.round(percent * 100);
+      // Test de atención: base 0..85 por acierto + hasta +15 por velocidad.
+      const bonus = SPEED.concentrationBonusMax * speed * percent;
+      const bonusPts = Math.round(bonus);
+      const pts = Math.max(0, Math.min(100, Math.round(percent * 85 + bonus)));
       headline = String(pts);
       headlineLabel = 'Puntuación de concentración';
-      if (percent >= 0.85) tier = { label: 'Excelente foco', level: 'high' };
-      else if (percent >= 0.65) tier = { label: 'Buen foco', level: 'mid-high' };
-      else if (percent >= 0.4) tier = { label: 'Foco medio', level: 'mid-low' };
+      if (pts >= 85) tier = { label: 'Excelente foco', level: 'high' };
+      else if (pts >= 65) tier = { label: 'Buen foco', level: 'mid-high' };
+      else if (pts >= 40) tier = { label: 'Foco medio', level: 'mid-low' };
       else tier = { label: 'Foco mejorable', level: 'low' };
-      message = `Has acertado ${correctCount} de ${questions.length} bajo presión de tiempo.`;
+      message = `Has acertado ${correctCount} de ${questions.length} bajo presión de tiempo. La velocidad suma +${bonusPts} puntos.`;
+      speedInfo = {
+        label: speedLabel(speed),
+        detail: `${formatTime(timeUsed)} de ${formatTime(t.timeLimit)} · +${bonusPts} pts por velocidad`
+      };
     }
 
     // Revisión de respuestas.
@@ -311,7 +361,7 @@
 
     return {
       testId: t.id, title: t.title, icon: t.icon, type: 'quiz',
-      headline, headlineLabel, tier,
+      headline, headlineLabel, tier, speedInfo,
       stats: [
         { label: 'Aciertos', value: `${correctCount}/${questions.length}` },
         { label: 'Tiempo usado', value: formatTime(timeUsed) },
@@ -380,9 +430,26 @@
       message = `${verb} ${top.label.toLowerCase()}. Mira el desglose para ver tu perfil completo.`;
     }
 
+    // El tiempo NO altera el perfil (no tendría base científica); se usa como
+    // indicador de calidad de respuesta (Huang et al., 2012): responder muy
+    // rápido, <2 s por ítem, sugiere poca reflexión.
+    const avgPerItem = answered ? timeUsed / answered : 0;
+    let speedInfo;
+    if (answered >= 3 && avgPerItem < SPEED.carelessSecondsPerItem) {
+      speedInfo = {
+        label: '⚠️ Respuestas muy rápidas',
+        detail: `~${avgPerItem.toFixed(1)} s por pregunta. Por debajo de 2 s suele indicar respuesta poco reflexiva; interpreta el perfil con cautela.`
+      };
+    } else {
+      speedInfo = {
+        label: '✔️ Ritmo de respuesta fiable',
+        detail: `~${avgPerItem.toFixed(1)} s por pregunta.`
+      };
+    }
+
     return {
       testId: t.id, title: t.title, icon: t.icon, type: 'scale',
-      headline, headlineLabel, tier,
+      headline, headlineLabel, tier, speedInfo,
       stats: [
         { label: 'Respondidas', value: `${answered}/${questions.length}` },
         { label: 'Tiempo usado', value: formatTime(timeUsed) }
@@ -421,6 +488,14 @@
     $('result-headline-label').textContent = r.headlineLabel;
     $('result-tier').textContent = r.tier.label;
     $('result-tier').className = `iq-tier tier-${r.tier.level}`;
+
+    const speedEl = $('result-speed');
+    if (r.speedInfo) {
+      speedEl.classList.remove('hidden');
+      speedEl.innerHTML = `<strong>${esc(r.speedInfo.label)}</strong> · ${esc(r.speedInfo.detail)}`;
+    } else {
+      speedEl.classList.add('hidden');
+    }
 
     const stats = $('result-stats');
     stats.innerHTML = '';
@@ -494,7 +569,8 @@
         tier: r.tier.label,
         stats: r.stats,
         breakdown: r.breakdown,
-        message: r.message
+        message: r.message,
+        speed: r.speedInfo || null
       }))
     };
   }
@@ -505,6 +581,7 @@
         <h2 style="margin:0 0 4px;font-size:18px;">${r.icon} ${esc(r.title)}</h2>
         <p style="margin:0 0 10px;color:#6b7280;font-size:13px;">${esc(r.headlineLabel)}:
           <strong style="color:#111827;font-size:16px;">${esc(r.headline)}</strong> — ${esc(r.tier)}</p>
+        ${r.speed ? `<p style="margin:0 0 8px;font-size:12px;color:#6b7280;">${esc(r.speed.label)} · ${esc(r.speed.detail)}</p>` : ''}
         <p style="margin:0 0 10px;font-size:14px;">${esc(r.message || '')}</p>
         <table style="width:100%;border-collapse:collapse;font-size:13px;">
           ${r.breakdown.map((b) => `
