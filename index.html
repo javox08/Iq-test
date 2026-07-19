@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Test de CI | Mide tu coeficiente intelectual</title>
-<meta name="description" content="Test de coeficiente intelectual cronometrado con preguntas de lógica, matemáticas, patrones y razonamiento verbal.">
+<title>Batería de Tests Psicológicos | Personalidad, CI y más</title>
+<meta name="description" content="Batería de tests recreativos: personalidad Big Five, inteligencia emocional, estilo de aprendizaje, estrés, atención y coeficiente intelectual. Con cronómetro e informe por correo.">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🧠</text></svg>">
 <link rel="stylesheet" href="style.css">
 </head>
@@ -14,47 +14,64 @@
 
 <main class="app">
 
-  <!-- PANTALLA DE INICIO -->
-  <section id="screen-start" class="screen active">
-    <div class="card">
+  <!-- ============ PORTADA / HUB ============ -->
+  <section id="screen-hub" class="screen active">
+    <header class="hub-header">
       <div class="brain-icon">🧠</div>
-      <h1>Test de Coeficiente Intelectual</h1>
-      <p class="subtitle">20 preguntas · lógica, patrones, matemáticas y razonamiento verbal</p>
+      <h1>Batería de Tests Psicológicos</h1>
+      <p class="subtitle">Elige un test. Cada intento baraja las preguntas, así que nunca es igual.</p>
+    </header>
+
+    <div id="test-grid" class="test-grid"></div>
+
+    <div id="report-bar" class="report-bar hidden">
+      <div class="report-info">
+        <strong>📋 Informe de resultados</strong>
+        <span id="report-count" class="report-count">0 tests completados</span>
+      </div>
+      <button id="btn-open-report" class="btn btn-primary">Ver / enviar informe ✉️</button>
+    </div>
+
+    <p class="disclaimer disclaimer-global">
+      ⚠️ Todos los tests son de carácter recreativo y orientativo. No son instrumentos
+      clínicos ni sustituyen una evaluación psicológica profesional.
+    </p>
+  </section>
+
+  <!-- ============ INTRO DE UN TEST ============ -->
+  <section id="screen-intro" class="screen">
+    <div class="card">
+      <button class="back-link" id="btn-intro-back">← Volver</button>
+      <div id="intro-icon" class="brain-icon">🧠</div>
+      <h1 id="intro-title">Test</h1>
+      <p id="intro-desc" class="subtitle"></p>
 
       <div class="info-grid">
         <div class="info-item">
-          <span class="info-num">20</span>
+          <span id="intro-count" class="info-num">20</span>
           <span class="info-label">Preguntas</span>
         </div>
         <div class="info-item">
-          <span class="info-num">10:00</span>
+          <span id="intro-time" class="info-num">10:00</span>
           <span class="info-label">Minutos</span>
         </div>
         <div class="info-item">
-          <span class="info-num">4</span>
-          <span class="info-label">Categorías</span>
+          <span id="intro-type" class="info-num">Quiz</span>
+          <span class="info-label">Formato</span>
         </div>
       </div>
 
-      <ul class="rules">
-        <li>Tienes <strong>10 minutos</strong> en total para completar el test.</li>
-        <li>Si el tiempo se agota, el test se enviará automáticamente con las respuestas dadas.</li>
-        <li>Cada pregunta tiene una única respuesta correcta.</li>
-        <li>Al finalizar verás tu puntuación y una estimación de CI orientativa.</li>
-      </ul>
+      <ul id="intro-rules" class="rules"></ul>
 
-      <p class="disclaimer">
-        ⚠️ Este test es de carácter recreativo/orientativo. No es un instrumento clínico
-        ni sustituye una evaluación psicométrica profesional.
-      </p>
+      <p id="intro-disclaimer" class="disclaimer"></p>
 
-      <input id="player-name" type="text" placeholder="Tu nombre (opcional)" maxlength="30" autocomplete="off">
+      <input id="player-name" type="text" placeholder="Tu nombre (opcional)" maxlength="40" autocomplete="off">
 
-      <button id="btn-start" class="btn btn-primary">Comenzar test ▶</button>
+      <button id="btn-start" class="btn btn-primary">Comenzar ▶</button>
     </div>
   </section>
 
-  <!-- PANTALLA DEL TEST -->
+  <!-- ============ TEST EN CURSO ============ -->
   <section id="screen-quiz" class="screen">
     <div class="quiz-header">
       <div class="progress-wrap">
@@ -65,7 +82,7 @@
     </div>
 
     <div class="card quiz-card">
-      <span id="q-category" class="badge">Lógica</span>
+      <span id="q-category" class="badge">Categoría</span>
       <h2 id="q-text" class="q-text">Pregunta</h2>
       <div id="q-options" class="options"></div>
     </div>
@@ -73,59 +90,67 @@
     <div class="quiz-nav">
       <button id="btn-prev" class="btn btn-ghost">◀ Anterior</button>
       <button id="btn-next" class="btn btn-primary">Siguiente ▶</button>
-      <button id="btn-finish" class="btn btn-success hidden">Finalizar test ✔</button>
+      <button id="btn-finish" class="btn btn-success hidden">Finalizar ✔</button>
     </div>
   </section>
 
-  <!-- PANTALLA DE RESULTADOS -->
+  <!-- ============ RESULTADO ============ -->
   <section id="screen-result" class="screen">
     <div class="card result-card">
-      <div class="result-icon">🎯</div>
-      <h1>¡Test completado!</h1>
+      <div id="result-icon" class="result-icon">🎯</div>
+      <h1 id="result-title">Resultado</h1>
       <p id="result-name" class="subtitle"></p>
 
       <div class="iq-score-wrap">
-        <div class="iq-score" id="iq-score">100</div>
-        <div class="iq-label">Estimación de CI</div>
-        <div id="iq-tier" class="iq-tier">Promedio</div>
+        <div class="iq-score" id="result-headline">—</div>
+        <div class="iq-label" id="result-headline-label">Resultado</div>
+        <div id="result-tier" class="iq-tier">—</div>
       </div>
 
-      <div class="info-grid">
-        <div class="info-item">
-          <span id="stat-correct" class="info-num">0/20</span>
-          <span class="info-label">Aciertos</span>
-        </div>
-        <div class="info-item">
-          <span id="stat-time" class="info-num">0:00</span>
-          <span class="info-label">Tiempo usado</span>
-        </div>
-        <div class="info-item">
-          <span id="stat-percent" class="info-num">0%</span>
-          <span class="info-label">Precisión</span>
-        </div>
-      </div>
+      <div id="result-stats" class="info-grid"></div>
 
-      <h3 class="breakdown-title">Resultado por categoría</h3>
+      <h3 class="breakdown-title" id="breakdown-title">Desglose</h3>
       <div id="category-breakdown" class="breakdown"></div>
 
-      <p class="disclaimer">
-        ⚠️ Recuerda: esta puntuación es orientativa y con fines de entretenimiento,
-        no constituye un diagnóstico ni una medición psicométrica certificada.
-      </p>
+      <p id="result-message" class="result-message"></p>
+
+      <p id="result-disclaimer" class="disclaimer"></p>
 
       <div class="result-actions">
-        <button id="btn-review" class="btn btn-ghost">Ver respuestas</button>
-        <button id="btn-restart" class="btn btn-primary">Repetir test 🔁</button>
+        <button id="btn-review" class="btn btn-ghost hidden">Ver respuestas</button>
+        <button id="btn-retry" class="btn btn-ghost">Repetir 🔁</button>
+        <button id="btn-result-home" class="btn btn-primary">Inicio 🏠</button>
       </div>
 
       <div id="review-wrap" class="review-wrap hidden"></div>
     </div>
   </section>
 
+  <!-- ============ MODAL INFORME / CORREO ============ -->
+  <div id="report-modal" class="modal hidden">
+    <div class="modal-card">
+      <button class="modal-close" id="btn-report-close">✕</button>
+      <h2>📋 Tu informe</h2>
+      <p class="subtitle">Resumen de los tests que has completado en esta sesión.</p>
+
+      <div id="report-summary" class="report-summary"></div>
+
+      <div class="report-email">
+        <label for="report-email-input">Recíbelo por correo</label>
+        <input id="report-email-input" type="email" placeholder="tu@correo.com" autocomplete="email">
+        <button id="btn-send-email" class="btn btn-primary">Enviar informe por correo ✉️</button>
+        <p id="report-status" class="report-status"></p>
+      </div>
+
+      <button id="btn-download-report" class="btn btn-ghost">⬇️ Descargar informe (HTML)</button>
+    </div>
+  </div>
+
 </main>
 
-<footer class="site-footer">Hecho con 🧠 · Test de CI recreativo</footer>
+<footer class="site-footer">Hecho con 🧠 · Batería de tests recreativos</footer>
 
+<script src="data.js"></script>
 <script src="script.js"></script>
 </body>
 </html>

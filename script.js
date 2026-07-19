@@ -1,280 +1,256 @@
 (() => {
   'use strict';
 
-  const TOTAL_TIME = 600; // 10 minutos en segundos
-
-  const QUESTIONS = [
-    // ---- LÓGICA ----
-    {
-      category: 'Lógica',
-      text: 'Completa la secuencia: 2, 4, 8, 16, ?',
-      options: ['24', '30', '32', '20'],
-      correct: 2
-    },
-    {
-      category: 'Lógica',
-      text: 'Todos los Bloops son Razzles. Todos los Razzles son Lazzles. ¿Todos los Bloops son necesariamente Lazzles?',
-      options: ['Sí, siempre', 'No, nunca', 'Solo a veces', 'No hay información suficiente'],
-      correct: 0
-    },
-    {
-      category: 'Lógica',
-      text: 'Ana es más alta que Bruno. Carla es más baja que Bruno. ¿Quién es el más bajo de los tres?',
-      options: ['Ana', 'Bruno', 'Carla', 'No se puede saber'],
-      correct: 2
-    },
-    {
-      category: 'Lógica',
-      text: '¿Qué número no pertenece al grupo? 3, 5, 7, 10, 11',
-      options: ['3', '7', '10', '11'],
-      correct: 2
-    },
-    {
-      category: 'Lógica',
-      text: 'Si hoy es miércoles, ¿qué día será dentro de 100 días?',
-      options: ['Jueves', 'Viernes', 'Sábado', 'Domingo'],
-      correct: 1
-    },
-
-    // ---- MATEMÁTICAS ----
-    {
-      category: 'Matemáticas',
-      text: '¿Cuánto es 15 × 3 − 8?',
-      options: ['31', '37', '45', '52'],
-      correct: 1
-    },
-    {
-      category: 'Matemáticas',
-      text: 'Completa la serie de Fibonacci: 1, 1, 2, 3, 5, 8, ?',
-      options: ['11', '12', '13', '14'],
-      correct: 2
-    },
-    {
-      category: 'Matemáticas',
-      text: 'Una camiseta cuesta 80€ tras un descuento del 20%. ¿Cuál era el precio original?',
-      options: ['90€', '96€', '100€', '110€'],
-      correct: 2
-    },
-    {
-      category: 'Matemáticas',
-      text: '¿Cuánto es 7² − 6²?',
-      options: ['1', '7', '13', '49'],
-      correct: 2
-    },
-    {
-      category: 'Matemáticas',
-      text: 'Un tren recorre 60 km en 45 minutos. ¿Cuál es su velocidad en km/h?',
-      options: ['60 km/h', '75 km/h', '80 km/h', '90 km/h'],
-      correct: 2
-    },
-
-    // ---- PATRONES ----
-    {
-      category: 'Patrones',
-      text: 'Completa la secuencia de letras: A, C, E, G, ?',
-      options: ['H', 'I', 'J', 'F'],
-      correct: 1
-    },
-    {
-      category: 'Patrones',
-      text: 'Completa la serie numérica: 2, 6, 12, 20, 30, ?',
-      options: ['36', '40', '42', '44'],
-      correct: 2
-    },
-    {
-      category: 'Patrones',
-      text: 'Sigue el patrón de figuras: Círculo, Cuadrado, Triángulo, Círculo, Cuadrado, ?',
-      options: ['Círculo', 'Cuadrado', 'Triángulo', 'Rombo'],
-      correct: 2
-    },
-    {
-      category: 'Patrones',
-      text: 'Completa la secuencia: 1, 4, 9, 16, 25, ?',
-      options: ['30', '32', '36', '49'],
-      correct: 2
-    },
-    {
-      category: 'Patrones',
-      text: 'Completa la secuencia de letras: Z, Y, X, W, ?',
-      options: ['U', 'V', 'T', 'S'],
-      correct: 1
-    },
-
-    // ---- VERBAL ----
-    {
-      category: 'Verbal',
-      text: 'Perro es a Cachorro como Gato es a...',
-      options: ['Felino', 'Gatito', 'Maullido', 'Ratón'],
-      correct: 1
-    },
-    {
-      category: 'Verbal',
-      text: '¿Cuál es el antónimo de "efímero"?',
-      options: ['Fugaz', 'Breve', 'Duradero', 'Instantáneo'],
-      correct: 2
-    },
-    {
-      category: 'Verbal',
-      text: 'Libro es a Leer como Comida es a...',
-      options: ['Cocinar', 'Comer', 'Cortar', 'Servir'],
-      correct: 1
-    },
-    {
-      category: 'Verbal',
-      text: '¿Cuál es el sinónimo de "locuaz"?',
-      options: ['Callado', 'Tímido', 'Hablador', 'Sereno'],
-      correct: 2
-    },
-    {
-      category: 'Verbal',
-      text: 'Médico es a Hospital como Profesor es a...',
-      options: ['Libro', 'Escuela', 'Alumno', 'Pizarra'],
-      correct: 1
-    }
-  ];
-
-  const state = {
-    current: 0,
-    answers: new Array(QUESTIONS.length).fill(null),
-    timeLeft: TOTAL_TIME,
-    timerId: null,
-    startedAt: null,
-    finished: false,
-    playerName: ''
-  };
-
+  const { TESTS, TEST_ORDER } = window.APP_DATA;
   const $ = (id) => document.getElementById(id);
 
   const screens = {
-    start: $('screen-start'),
+    hub: $('screen-hub'),
+    intro: $('screen-intro'),
     quiz: $('screen-quiz'),
     result: $('screen-result')
   };
 
+  // Resultados acumulados de la sesión (para el informe "de todo").
+  const session = {
+    playerName: '',
+    results: {} // testId -> objeto de resultado
+  };
+
+  // Estado del test en curso.
+  let run = null;
+
+  /* ---------------- utilidades ---------------- */
+
   function showScreen(name) {
     Object.values(screens).forEach((s) => s.classList.remove('active'));
     screens[name].classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'instant' in window ? 'instant' : 'auto' });
+  }
+
+  function shuffle(arr) {
+    const a = arr.slice();
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
   }
 
   function formatTime(totalSeconds) {
-    const s = Math.max(0, totalSeconds);
+    const s = Math.max(0, Math.round(totalSeconds));
     const m = Math.floor(s / 60);
     const sec = s % 60;
     return `${m}:${sec.toString().padStart(2, '0')}`;
   }
 
-  // ---------- INICIO ----------
+  function esc(str) {
+    return String(str).replace(/[&<>"']/g, (c) => (
+      { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]
+    ));
+  }
 
-  $('btn-start').addEventListener('click', () => {
-    state.playerName = $('player-name').value.trim();
-    state.current = 0;
-    state.answers = new Array(QUESTIONS.length).fill(null);
-    state.timeLeft = TOTAL_TIME;
-    state.finished = false;
-    state.startedAt = Date.now();
+  /* ---------------- PORTADA / HUB ---------------- */
+
+  function renderHub() {
+    const grid = $('test-grid');
+    grid.innerHTML = '';
+
+    TEST_ORDER.forEach((id) => {
+      const t = TESTS[id];
+      const done = session.results[id];
+      const card = document.createElement('button');
+      card.className = 'test-card' + (done ? ' done' : '');
+      card.type = 'button';
+      card.innerHTML = `
+        <div class="test-card-icon">${t.icon}</div>
+        <div class="test-card-body">
+          <span class="test-card-tag">${esc(t.tag)}</span>
+          <h3 class="test-card-title">${esc(t.title)}</h3>
+          <p class="test-card-desc">${esc(t.description)}</p>
+        </div>
+        <div class="test-card-foot">
+          <span class="test-card-meta">${t.pick} preguntas · ${Math.round(t.timeLimit / 60)} min</span>
+          ${done
+            ? `<span class="test-card-done">✔ ${esc(done.headline)}</span>`
+            : `<span class="test-card-go">Empezar →</span>`}
+        </div>`;
+      card.addEventListener('click', () => openIntro(id));
+      grid.appendChild(card);
+    });
+
+    renderReportBar();
+  }
+
+  function renderReportBar() {
+    const n = Object.keys(session.results).length;
+    const bar = $('report-bar');
+    bar.classList.toggle('hidden', n === 0);
+    $('report-count').textContent =
+      n === 1 ? '1 test completado' : `${n} tests completados`;
+  }
+
+  /* ---------------- INTRO DE UN TEST ---------------- */
+
+  function openIntro(testId) {
+    const t = TESTS[testId];
+    run = { testId };
+
+    $('intro-icon').textContent = t.icon;
+    $('intro-title').textContent = t.title;
+    $('intro-desc').textContent = t.description;
+    $('intro-count').textContent = t.pick;
+    $('intro-time').textContent = formatTime(t.timeLimit);
+    $('intro-type').textContent = t.type === 'quiz' ? 'Quiz' : 'Escala';
+
+    const rules = $('intro-rules');
+    rules.innerHTML = '';
+    const items = t.type === 'quiz'
+      ? [
+          `Tienes <strong>${Math.round(t.timeLimit / 60)} minutos</strong> en total.`,
+          'Si el tiempo se agota, el test se envía automáticamente.',
+          'Cada pregunta tiene una única respuesta correcta.',
+          'Puedes volver a preguntas anteriores antes de finalizar.'
+        ]
+      : [
+          `Tienes <strong>${Math.round(t.timeLimit / 60)} minutos</strong>, sin prisa.`,
+          'No hay respuestas correctas ni incorrectas.',
+          'Responde con sinceridad según lo que sueles sentir o hacer.',
+          'Puedes volver a preguntas anteriores antes de finalizar.'
+        ];
+    items.forEach((txt) => {
+      const li = document.createElement('li');
+      li.innerHTML = txt;
+      rules.appendChild(li);
+    });
+
+    const disc = $('intro-disclaimer');
+    disc.textContent = t.disclaimer || '';
+    disc.classList.toggle('hidden', !t.disclaimer);
+
+    $('player-name').value = session.playerName;
+    showScreen('intro');
+  }
+
+  /* ---------------- ARRANQUE DEL TEST ---------------- */
+
+  function startRun() {
+    const t = TESTS[run.testId];
+    session.playerName = $('player-name').value.trim();
+
+    // Barajar el banco y elegir las preguntas de este intento.
+    let questions = shuffle(t.pool).slice(0, Math.min(t.pick, t.pool.length));
+
+    // En los quiz, barajamos también las opciones y recalculamos la correcta.
+    if (t.type === 'quiz') {
+      questions = questions.map((q) => {
+        const opts = q.options.map((text, idx) => ({ text, correct: idx === q.correct }));
+        const shuffled = shuffle(opts);
+        return {
+          category: q.category,
+          text: q.text,
+          options: shuffled.map((o) => o.text),
+          correct: shuffled.findIndex((o) => o.correct)
+        };
+      });
+    }
+
+    run = {
+      testId: t.id,
+      test: t,
+      questions,
+      answers: new Array(questions.length).fill(null),
+      current: 0,
+      timeLeft: t.timeLimit,
+      timerId: null,
+      finished: false
+    };
 
     showScreen('quiz');
     renderQuestion();
     startTimer();
-  });
+  }
 
-  // ---------- TEMPORIZADOR ----------
+  /* ---------------- TEMPORIZADOR ---------------- */
 
   function startTimer() {
-    clearInterval(state.timerId);
+    clearInterval(run.timerId);
     updateTimerDisplay();
-    state.timerId = setInterval(() => {
-      state.timeLeft--;
+    run.timerId = setInterval(() => {
+      run.timeLeft--;
       updateTimerDisplay();
-      if (state.timeLeft <= 0) {
-        finishQuiz();
-      }
+      if (run.timeLeft <= 0) finishRun();
     }, 1000);
   }
 
   function updateTimerDisplay() {
     const el = $('timer');
-    el.textContent = formatTime(state.timeLeft);
-    el.classList.toggle('warning', state.timeLeft <= 60 && state.timeLeft > 20);
-    el.classList.toggle('danger', state.timeLeft <= 20);
+    el.textContent = formatTime(run.timeLeft);
+    el.classList.toggle('warning', run.timeLeft <= 60 && run.timeLeft > 20);
+    el.classList.toggle('danger', run.timeLeft <= 20);
   }
 
-  // ---------- RENDER PREGUNTA ----------
+  /* ---------------- RENDER PREGUNTA ---------------- */
 
   function renderQuestion() {
-    const q = QUESTIONS[state.current];
-    $('q-category').textContent = q.category;
+    const t = run.test;
+    const q = run.questions[run.current];
+    const isQuiz = t.type === 'quiz';
+
+    $('q-category').textContent = isQuiz ? q.category : t.tag;
     $('q-text').textContent = q.text;
 
-    const optionsWrap = $('q-options');
-    optionsWrap.innerHTML = '';
-    const letters = ['A', 'B', 'C', 'D'];
+    const wrap = $('q-options');
+    wrap.innerHTML = '';
+    const opts = isQuiz ? q.options : t.likert;
+    const letters = ['A', 'B', 'C', 'D', 'E'];
 
-    q.options.forEach((optText, idx) => {
+    opts.forEach((optText, idx) => {
       const btn = document.createElement('button');
       btn.className = 'option';
       btn.type = 'button';
-      if (state.answers[state.current] === idx) btn.classList.add('selected');
-      btn.innerHTML = `<span class="option-letter">${letters[idx]}</span><span>${optText}</span>`;
+      if (run.answers[run.current] === idx) btn.classList.add('selected');
+      const mark = isQuiz ? letters[idx] : (idx + 1);
+      btn.innerHTML = `<span class="option-letter">${mark}</span><span>${esc(optText)}</span>`;
       btn.addEventListener('click', () => selectAnswer(idx));
-      optionsWrap.appendChild(btn);
+      wrap.appendChild(btn);
     });
 
-    $('progress-text').textContent = `Pregunta ${state.current + 1} / ${QUESTIONS.length}`;
-    $('progress-fill').style.width = `${((state.current + 1) / QUESTIONS.length) * 100}%`;
+    $('progress-text').textContent = `Pregunta ${run.current + 1} / ${run.questions.length}`;
+    $('progress-fill').style.width = `${((run.current + 1) / run.questions.length) * 100}%`;
 
-    $('btn-prev').disabled = state.current === 0;
-    $('btn-prev').style.opacity = state.current === 0 ? '0.4' : '1';
+    $('btn-prev').disabled = run.current === 0;
+    $('btn-prev').style.opacity = run.current === 0 ? '0.4' : '1';
 
-    const isLast = state.current === QUESTIONS.length - 1;
+    const isLast = run.current === run.questions.length - 1;
     $('btn-next').classList.toggle('hidden', isLast);
     $('btn-finish').classList.toggle('hidden', !isLast);
   }
 
   function selectAnswer(idx) {
-    state.answers[state.current] = idx;
+    run.answers[run.current] = idx;
+    // Avance automático suave (salvo en la última).
+    const isLast = run.current === run.questions.length - 1;
     renderQuestion();
+    if (!isLast) {
+      setTimeout(() => {
+        if (run && !run.finished) {
+          run.current++;
+          renderQuestion();
+        }
+      }, 220);
+    }
   }
 
   $('btn-next').addEventListener('click', () => {
-    if (state.current < QUESTIONS.length - 1) {
-      state.current++;
-      renderQuestion();
-    }
+    if (run.current < run.questions.length - 1) { run.current++; renderQuestion(); }
   });
-
   $('btn-prev').addEventListener('click', () => {
-    if (state.current > 0) {
-      state.current--;
-      renderQuestion();
-    }
+    if (run.current > 0) { run.current--; renderQuestion(); }
   });
+  $('btn-finish').addEventListener('click', finishRun);
 
-  $('btn-finish').addEventListener('click', () => {
-    finishQuiz();
-  });
-
-  // ---------- FINALIZAR Y RESULTADOS ----------
-
-  function finishQuiz() {
-    if (state.finished) return;
-    state.finished = true;
-    clearInterval(state.timerId);
-
-    const timeUsed = TOTAL_TIME - Math.max(0, state.timeLeft);
-    const correctCount = state.answers.reduce(
-      (acc, ans, i) => acc + (ans === QUESTIONS[i].correct ? 1 : 0),
-      0
-    );
-    const percent = correctCount / QUESTIONS.length;
-
-    // Estimación de CI: mapeo lineal centrado en 100 (rango aprox. 55-145)
-    let iq = Math.round(55 + percent * 90);
-    iq = Math.max(55, Math.min(145, iq));
-
-    renderResults({ correctCount, percent, timeUsed, iq });
-    showScreen('result');
-  }
+  /* ---------------- CÁLCULO DE RESULTADOS ---------------- */
 
   function iqTier(iq) {
     if (iq < 85) return { label: 'Por debajo del promedio', level: 'low' };
@@ -285,63 +261,216 @@
     return { label: 'Muy superior', level: 'high' };
   }
 
-  function renderResults({ correctCount, percent, timeUsed, iq }) {
-    $('result-name').textContent = state.playerName
-      ? `Resultados de ${state.playerName}`
-      : 'Estos son tus resultados';
+  function computeQuiz(t, questions, answers, timeUsed) {
+    const correctCount = answers.reduce(
+      (acc, ans, i) => acc + (ans === questions[i].correct ? 1 : 0), 0);
+    const percent = correctCount / questions.length;
 
-    const tier = iqTier(iq);
-    $('iq-score').textContent = iq;
-    $('iq-tier').textContent = tier.label;
-    $('iq-tier').className = `iq-tier tier-${tier.level}`;
+    // Desglose por categoría.
+    const cats = {};
+    questions.forEach((q, i) => {
+      const c = q.category;
+      if (!cats[c]) cats[c] = { correct: 0, total: 0 };
+      cats[c].total++;
+      if (answers[i] === q.correct) cats[c].correct++;
+    });
+    const breakdown = Object.entries(cats).map(([label, d]) => ({
+      label, value: `${d.correct}/${d.total}`, pct: Math.round((d.correct / d.total) * 100)
+    }));
 
-    $('stat-correct').textContent = `${correctCount}/${QUESTIONS.length}`;
-    $('stat-time').textContent = formatTime(timeUsed);
-    $('stat-percent').textContent = `${Math.round(percent * 100)}%`;
+    let headline, headlineLabel, tier, message;
+    if (t.scoring === 'iq') {
+      let iq = Math.round(55 + percent * 90);
+      iq = Math.max(55, Math.min(145, iq));
+      headline = String(iq);
+      headlineLabel = 'Estimación de CI';
+      tier = iqTier(iq);
+      message = `Has acertado ${correctCount} de ${questions.length} preguntas. Recuerda que la estimación de CI es orientativa.`;
+    } else {
+      const pts = Math.round(percent * 100);
+      headline = String(pts);
+      headlineLabel = 'Puntuación de concentración';
+      if (percent >= 0.85) tier = { label: 'Excelente foco', level: 'high' };
+      else if (percent >= 0.65) tier = { label: 'Buen foco', level: 'mid-high' };
+      else if (percent >= 0.4) tier = { label: 'Foco medio', level: 'mid-low' };
+      else tier = { label: 'Foco mejorable', level: 'low' };
+      message = `Has acertado ${correctCount} de ${questions.length} bajo presión de tiempo.`;
+    }
 
-    // Desglose por categoría
-    const categories = {};
-    QUESTIONS.forEach((q, i) => {
-      if (!categories[q.category]) categories[q.category] = { correct: 0, total: 0 };
-      categories[q.category].total++;
-      if (state.answers[i] === q.correct) categories[q.category].correct++;
+    // Revisión de respuestas.
+    const letters = ['A', 'B', 'C', 'D', 'E'];
+    const review = questions.map((q, i) => {
+      const u = answers[i];
+      return {
+        text: q.text,
+        userText: u === null ? 'Sin responder' : `${letters[u]}) ${q.options[u]}`,
+        correctText: `${letters[q.correct]}) ${q.options[q.correct]}`,
+        isCorrect: u === q.correct
+      };
     });
 
-    const breakdownWrap = $('category-breakdown');
-    breakdownWrap.innerHTML = '';
-    Object.entries(categories).forEach(([cat, data]) => {
-      const pct = Math.round((data.correct / data.total) * 100);
+    return {
+      testId: t.id, title: t.title, icon: t.icon, type: 'quiz',
+      headline, headlineLabel, tier,
+      stats: [
+        { label: 'Aciertos', value: `${correctCount}/${questions.length}` },
+        { label: 'Tiempo usado', value: formatTime(timeUsed) },
+        { label: 'Precisión', value: `${Math.round(percent * 100)}%` }
+      ],
+      breakdownTitle: 'Resultado por categoría',
+      breakdown, message, review, timeUsed
+    };
+  }
+
+  function computeScale(t, questions, answers, timeUsed) {
+    const dims = {};
+    Object.keys(t.dimensions).forEach((k) => (dims[k] = { sum: 0, n: 0 }));
+    let answered = 0;
+
+    questions.forEach((q, i) => {
+      const sel = answers[i];
+      if (sel === null) return;
+      answered++;
+      let v = sel + 1; // 1..5
+      if (q.reverse) v = 6 - v;
+      dims[q.dim].sum += v;
+      dims[q.dim].n += 1;
+    });
+
+    const dimResults = Object.keys(t.dimensions).map((k) => {
+      const d = dims[k];
+      const pct = d.n ? Math.round(((d.sum - d.n) / (4 * d.n)) * 100) : 0;
+      return { key: k, label: t.dimensions[k], pct };
+    });
+
+    const breakdown = dimResults.map((d) => ({
+      label: d.label, value: `${d.pct}%`, pct: d.pct
+    }));
+
+    let headline, headlineLabel, tier, message;
+
+    if (t.invertHeadline) {
+      // Test de estrés: una sola dimensión, más alto = peor.
+      const pct = dimResults[0].pct;
+      headlineLabel = 'Nivel de estrés percibido';
+      if (pct >= 66) {
+        headline = 'Alto';
+        tier = { label: 'Estrés alto', level: 'low' };
+        message = 'Tu nivel de estrés percibido es alto. Cuidarte, descansar y, si lo necesitas, hablar con un profesional o alguien de confianza puede marcar la diferencia.';
+      } else if (pct >= 40) {
+        headline = 'Moderado';
+        tier = { label: 'Estrés moderado', level: 'mid-low' };
+        message = 'Tienes un nivel de estrés moderado. Buenos hábitos de sueño, ejercicio y pausas pueden ayudarte a mantenerlo a raya.';
+      } else {
+        headline = 'Bajo';
+        tier = { label: 'Estrés bajo', level: 'high' };
+        message = '¡Buen trabajo! Percibes un nivel de estrés bajo y sensación de control sobre tu vida.';
+      }
+    } else {
+      // Rasgo / estilo dominante.
+      const top = dimResults.slice().sort((a, b) => b.pct - a.pct)[0];
+      headline = top.label;
+      headlineLabel = t.id === 'vark' ? 'Estilo dominante'
+        : t.id === 'eq' ? 'Fortaleza principal'
+        : 'Rasgo dominante';
+      tier = { label: `${top.pct}% · el más marcado`, level: 'mid' };
+      const verb = t.id === 'vark' ? 'Aprendes mejor de forma'
+        : t.id === 'eq' ? 'Tu mayor fortaleza emocional es la'
+        : 'Tu rasgo más marcado es la';
+      message = `${verb} ${top.label.toLowerCase()}. Mira el desglose para ver tu perfil completo.`;
+    }
+
+    return {
+      testId: t.id, title: t.title, icon: t.icon, type: 'scale',
+      headline, headlineLabel, tier,
+      stats: [
+        { label: 'Respondidas', value: `${answered}/${questions.length}` },
+        { label: 'Tiempo usado', value: formatTime(timeUsed) }
+      ],
+      breakdownTitle: 'Tu perfil',
+      breakdown, message, review: null, timeUsed
+    };
+  }
+
+  function finishRun() {
+    if (!run || run.finished) return;
+    run.finished = true;
+    clearInterval(run.timerId);
+
+    const t = run.test;
+    const timeUsed = t.timeLimit - Math.max(0, run.timeLeft);
+    const result = t.type === 'quiz'
+      ? computeQuiz(t, run.questions, run.answers, timeUsed)
+      : computeScale(t, run.questions, run.answers, timeUsed);
+
+    session.results[t.id] = result;
+    renderResult(result);
+    showScreen('result');
+  }
+
+  /* ---------------- RENDER RESULTADO ---------------- */
+
+  function renderResult(r) {
+    const t = TESTS[r.testId];
+    $('result-icon').textContent = r.icon;
+    $('result-title').textContent = r.title;
+    $('result-name').textContent = session.playerName
+      ? `Resultados de ${session.playerName}` : 'Estos son tus resultados';
+
+    $('result-headline').textContent = r.headline;
+    $('result-headline-label').textContent = r.headlineLabel;
+    $('result-tier').textContent = r.tier.label;
+    $('result-tier').className = `iq-tier tier-${r.tier.level}`;
+
+    const stats = $('result-stats');
+    stats.innerHTML = '';
+    r.stats.forEach((s) => {
+      const div = document.createElement('div');
+      div.className = 'info-item';
+      div.innerHTML = `<span class="info-num">${esc(s.value)}</span><span class="info-label">${esc(s.label)}</span>`;
+      stats.appendChild(div);
+    });
+
+    $('breakdown-title').textContent = r.breakdownTitle;
+    const bd = $('category-breakdown');
+    bd.innerHTML = '';
+    r.breakdown.forEach((b) => {
       const row = document.createElement('div');
       row.className = 'breakdown-item';
       row.innerHTML = `
-        <span class="breakdown-label">${cat}</span>
-        <span class="breakdown-bar"><span class="breakdown-fill" style="width:${pct}%"></span></span>
-        <span class="breakdown-score">${data.correct}/${data.total}</span>
-      `;
-      breakdownWrap.appendChild(row);
+        <span class="breakdown-label">${esc(b.label)}</span>
+        <span class="breakdown-bar"><span class="breakdown-fill" style="width:${b.pct}%"></span></span>
+        <span class="breakdown-score">${esc(b.value)}</span>`;
+      bd.appendChild(row);
     });
 
-    // Revisión de respuestas (oculta por defecto)
+    $('result-message').textContent = r.message || '';
+
+    const disc = $('result-disclaimer');
+    disc.textContent = t.disclaimer
+      ? t.disclaimer
+      : 'Resultado orientativo con fines de entretenimiento, no es un diagnóstico ni una medición certificada.';
+
+    // Revisión (solo quiz).
+    const reviewBtn = $('btn-review');
     const reviewWrap = $('review-wrap');
     reviewWrap.innerHTML = '';
     reviewWrap.classList.add('hidden');
-    $('btn-review').textContent = 'Ver respuestas';
-
-    const letters = ['A', 'B', 'C', 'D'];
-    QUESTIONS.forEach((q, i) => {
-      const userIdx = state.answers[i];
-      const item = document.createElement('div');
-      item.className = 'review-item';
-      const userText = userIdx === null ? 'Sin responder' : `${letters[userIdx]}) ${q.options[userIdx]}`;
-      const correctText = `${letters[q.correct]}) ${q.options[q.correct]}`;
-      const isCorrect = userIdx === q.correct;
-      item.innerHTML = `
-        <div class="review-q">${i + 1}. ${q.text}</div>
-        <div class="review-answer ${isCorrect ? 'review-correct' : 'review-wrong'}">Tu respuesta: ${userText}</div>
-        ${isCorrect ? '' : `<div class="review-answer review-correct">Respuesta correcta: ${correctText}</div>`}
-      `;
-      reviewWrap.appendChild(item);
-    });
+    reviewBtn.textContent = 'Ver respuestas';
+    if (r.review) {
+      reviewBtn.classList.remove('hidden');
+      r.review.forEach((rv, i) => {
+        const item = document.createElement('div');
+        item.className = 'review-item';
+        item.innerHTML = `
+          <div class="review-q">${i + 1}. ${esc(rv.text)}</div>
+          <div class="review-answer ${rv.isCorrect ? 'review-correct' : 'review-wrong'}">Tu respuesta: ${esc(rv.userText)}</div>
+          ${rv.isCorrect ? '' : `<div class="review-answer review-correct">Correcta: ${esc(rv.correctText)}</div>`}`;
+        reviewWrap.appendChild(item);
+      });
+    } else {
+      reviewBtn.classList.add('hidden');
+    }
   }
 
   $('btn-review').addEventListener('click', () => {
@@ -351,9 +480,157 @@
     $('btn-review').textContent = willShow ? 'Ocultar respuestas' : 'Ver respuestas';
   });
 
-  $('btn-restart').addEventListener('click', () => {
-    $('player-name').value = '';
-    showScreen('start');
+  /* ---------------- INFORME / CORREO ---------------- */
+
+  function buildReportPayload() {
+    return {
+      playerName: session.playerName || '',
+      date: new Date().toLocaleString('es-ES'),
+      results: Object.values(session.results).map((r) => ({
+        title: r.title,
+        icon: r.icon,
+        headline: r.headline,
+        headlineLabel: r.headlineLabel,
+        tier: r.tier.label,
+        stats: r.stats,
+        breakdown: r.breakdown,
+        message: r.message
+      }))
+    };
+  }
+
+  function reportToHtml(payload) {
+    const blocks = payload.results.map((r) => `
+      <div style="border:1px solid #e5e7eb;border-radius:12px;padding:16px;margin:0 0 16px;">
+        <h2 style="margin:0 0 4px;font-size:18px;">${r.icon} ${esc(r.title)}</h2>
+        <p style="margin:0 0 10px;color:#6b7280;font-size:13px;">${esc(r.headlineLabel)}:
+          <strong style="color:#111827;font-size:16px;">${esc(r.headline)}</strong> — ${esc(r.tier)}</p>
+        <p style="margin:0 0 10px;font-size:14px;">${esc(r.message || '')}</p>
+        <table style="width:100%;border-collapse:collapse;font-size:13px;">
+          ${r.breakdown.map((b) => `
+            <tr>
+              <td style="padding:4px 8px;color:#374151;">${esc(b.label)}</td>
+              <td style="padding:4px 8px;width:55%;">
+                <div style="background:#e5e7eb;border-radius:6px;height:8px;">
+                  <div style="background:#7c5cff;height:8px;border-radius:6px;width:${b.pct}%;"></div>
+                </div>
+              </td>
+              <td style="padding:4px 8px;text-align:right;font-weight:bold;">${esc(b.value)}</td>
+            </tr>`).join('')}
+        </table>
+      </div>`).join('');
+
+    return `<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><title>Informe de tests</title></head>
+      <body style="font-family:Arial,Helvetica,sans-serif;background:#f9fafb;color:#111827;margin:0;padding:24px;">
+        <div style="max-width:640px;margin:0 auto;background:#fff;border-radius:16px;padding:28px;">
+          <h1 style="margin:0 0 4px;">🧠 Informe de tests</h1>
+          <p style="margin:0 0 20px;color:#6b7280;">
+            ${payload.playerName ? esc(payload.playerName) + ' · ' : ''}${esc(payload.date)}
+          </p>
+          ${blocks || '<p>No hay tests completados.</p>'}
+          <p style="margin:20px 0 0;font-size:12px;color:#9ca3af;">
+            ⚠️ Resultados recreativos y orientativos. No constituyen un diagnóstico ni una
+            evaluación psicológica profesional.
+          </p>
+        </div>
+      </body></html>`;
+  }
+
+  function openReport() {
+    const summary = $('report-summary');
+    summary.innerHTML = '';
+    Object.values(session.results).forEach((r) => {
+      const row = document.createElement('div');
+      row.className = 'report-row';
+      row.innerHTML = `
+        <span class="report-row-icon">${r.icon}</span>
+        <span class="report-row-title">${esc(r.title)}</span>
+        <span class="report-row-score">${esc(r.headline)}</span>`;
+      summary.appendChild(row);
+    });
+    $('report-status').textContent = '';
+    $('report-status').className = 'report-status';
+    $('report-modal').classList.remove('hidden');
+  }
+
+  function closeReport() {
+    $('report-modal').classList.add('hidden');
+  }
+
+  function downloadReport() {
+    const html = reportToHtml(buildReportPayload());
+    const blob = new Blob([html], { type: 'text/html' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'informe-tests.html';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
+
+  async function sendEmail() {
+    const email = $('report-email-input').value.trim();
+    const status = $('report-status');
+    const btn = $('btn-send-email');
+
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
+      status.textContent = 'Introduce un correo válido.';
+      status.className = 'report-status error';
+      return;
+    }
+
+    btn.disabled = true;
+    status.textContent = 'Enviando…';
+    status.className = 'report-status';
+
+    const payload = buildReportPayload();
+    payload.email = email;
+    payload.html = reportToHtml(payload);
+
+    try {
+      const res = await fetch('/api/send-report', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      let data = {};
+      try { data = await res.json(); } catch (_) {}
+
+      if (res.ok && data.ok) {
+        status.textContent = '✔ Informe enviado a ' + email;
+        status.className = 'report-status ok';
+      } else if (res.status === 501) {
+        status.textContent = 'El envío por correo no está configurado en el servidor. Usa «Descargar informe».';
+        status.className = 'report-status error';
+      } else {
+        status.textContent = (data.error || 'No se pudo enviar el correo.') + ' Puedes descargar el informe.';
+        status.className = 'report-status error';
+      }
+    } catch (e) {
+      status.textContent = 'No hay conexión con el servidor de correo. Descarga el informe como alternativa.';
+      status.className = 'report-status error';
+    } finally {
+      btn.disabled = false;
+    }
+  }
+
+  /* ---------------- EVENTOS ---------------- */
+
+  $('btn-intro-back').addEventListener('click', () => { showScreen('hub'); renderHub(); });
+  $('btn-start').addEventListener('click', startRun);
+  $('btn-retry').addEventListener('click', () => openIntro(run.testId));
+  $('btn-result-home').addEventListener('click', () => { showScreen('hub'); renderHub(); });
+  $('btn-open-report').addEventListener('click', openReport);
+  $('btn-report-close').addEventListener('click', closeReport);
+  $('btn-download-report').addEventListener('click', downloadReport);
+  $('btn-send-email').addEventListener('click', sendEmail);
+  $('report-modal').addEventListener('click', (e) => {
+    if (e.target === $('report-modal')) closeReport();
   });
+
+  /* ---------------- INICIO ---------------- */
+  renderHub();
 
 })();
