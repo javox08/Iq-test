@@ -30,7 +30,9 @@ index.html                  Pantallas (portada, intro, test, resultado, modal in
 style.css                   Estilos
 data.js                     "Base de datos": definición y banco de preguntas de cada test
 script.js                   Motor: baraja, cronómetro, puntuación, informe
-functions/api/send-report.js   Función serverless de Cloudflare que envía el correo (Resend)
+functions/api/send-report.js   Handler que envía el correo por Resend
+worker.js                   Punto de entrada del Worker: enruta /api/send-report y sirve lo estático
+wrangler.jsonc              Configuración de Cloudflare Workers (assets + script)
 ```
 
 ## Probar en local (sin correo)
@@ -52,31 +54,42 @@ npm i -g wrangler
 wrangler pages dev .
 ```
 
-## Desplegar en Cloudflare Pages
+## Desplegar en Cloudflare Workers (recomendado, ya configurado)
+
+El repo incluye `wrangler.jsonc` y `worker.js`, así que sirve como **Worker con activos
+estáticos** y además atiende `/api/send-report`.
 
 1. Sube el repo a GitHub (ya lo está).
-2. Cloudflare → **Workers & Pages → Create → Pages → Connect to Git** y elige el repo.
-3. Configuración de build:
-   - **Framework preset:** None
-   - **Build command:** *(vacío)*
-   - **Build output directory:** `/`
-4. Deploy. Cloudflare detecta la carpeta `functions/` y publica `/api/send-report`
-   automáticamente.
+2. Cloudflare → **Workers & Pages → Create → Workers → Import a repository** y elige el repo.
+3. No hace falta build command. Cloudflare usará `wrangler.jsonc` (que ya trae `main: worker.js`).
+4. Deploy. Tu web quedará en `https://<nombre>.<subdominio>.workers.dev`.
+
+> Importante: en modo Workers, la carpeta `functions/` **no** se enruta sola (eso es de
+> Cloudflare *Pages*). Por eso `worker.js` la llama a mano. Si tu `wrangler.jsonc` solo
+> tuviera `assets` sin `main`, el endpoint del correo no existiría.
 
 ## Configurar el envío de correo (Resend)
 
 El correo se envía con [Resend](https://resend.com) (tiene plan gratuito).
 
 1. Crea una cuenta en Resend y genera una **API key** (empieza por `re_`).
-2. En Cloudflare Pages → tu proyecto → **Settings → Environment variables**, añade:
-   - `RESEND_API_KEY` = tu API key.
+2. En Cloudflare → tu Worker → **Settings → Variables and Secrets** (Variables y secretos),
+   añade:
+   - `RESEND_API_KEY` = tu API key (márcala como *Secret*).
    - `REPORT_FROM` *(opcional)* = remitente, p.ej. `Tests <informe@tudominio.com>`.
-     Para usar un dominio propio debes verificarlo en Resend. Sin esta variable se usa
-     el remitente de pruebas `onboarding@resend.dev` (útil para probar enviándote a ti mismo).
-3. Vuelve a desplegar para que tome las variables.
+     Para un dominio propio debes verificarlo en Resend. Sin esta variable se usa el
+     remitente de pruebas `onboarding@resend.dev` (con él Resend solo deja enviar a tu
+     propio correo de la cuenta, útil para probar).
+3. Vuelve a desplegar (o **Retry deployment**) para que tome las variables.
 
 Si `RESEND_API_KEY` no está configurada, la web sigue funcionando: el envío por correo
 avisa de que no está disponible y el usuario puede **descargar** el informe.
+
+## (Alternativa) Desplegar como Cloudflare Pages
+
+También funciona como Pages: **Create → Pages → Connect to Git**, framework *None*, build
+vacío, output `/`. En ese modo la carpeta `functions/` se enruta sola y `worker.js`/
+`wrangler.jsonc` se ignoran. Las variables van en **Settings → Environment variables**.
 
 ## Personalizar
 

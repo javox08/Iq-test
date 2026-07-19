@@ -1,0 +1,18 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "iqtestpro",
+  "compatibility_date": "2026-07-19",
+  "compatibility_flags": [
+    "nodejs_compat"
+  ],
+  "observability": {
+    "enabled": true
+  },
+  // Script de servidor (necesario para el endpoint /api/send-report del correo).
+  "main": "worker.js",
+  // Sitio estático: se sirve todo el repo y se expone el binding ASSETS al Worker.
+  "assets": {
+    "directory": ".",
+    "binding": "ASSETS"
+  }
+}
