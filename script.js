@@ -85,6 +85,12 @@
     return '🐢 Pausado';
   }
 
+  // Un test es cronometrado si define timeLimit. Los tests de personalidad no lo
+  // definen: se hacen a tu ritmo, sin cuenta atrás.
+  function isTimed(t) {
+    return typeof t.timeLimit === 'number';
+  }
+
   /* ---------------- PORTADA / HUB ---------------- */
 
   function renderHub() {
@@ -105,7 +111,7 @@
           <p class="test-card-desc">${esc(t.description)}</p>
         </div>
         <div class="test-card-foot">
-          <span class="test-card-meta">${t.pick} preguntas · ${Math.round(t.timeLimit / 60)} min</span>
+          <span class="test-card-meta">${t.pick} preguntas · ${isTimed(t) ? Math.round(t.timeLimit / 60) + ' min' : 'a tu ritmo'}</span>
           ${done
             ? `<span class="test-card-done">✔ ${esc(done.headline)}</span>`
             : `<span class="test-card-go">Empezar →</span>`}
@@ -131,12 +137,17 @@
     const t = TESTS[testId];
     run = { testId };
 
+    const timed = isTimed(t);
     $('intro-icon').textContent = t.icon;
     $('intro-title').textContent = t.title;
     $('intro-desc').textContent = t.description;
     $('intro-count').textContent = t.pick;
-    $('intro-time').textContent = formatTime(t.timeLimit);
     $('intro-type').textContent = t.type === 'quiz' ? 'Quiz' : 'Escala';
+
+    // Caja de tiempo solo en tests cronometrados.
+    $('intro-time-item').classList.toggle('hidden', !timed);
+    $('intro-stats').style.gridTemplateColumns = `repeat(${timed ? 3 : 2}, 1fr)`;
+    if (timed) $('intro-time').textContent = formatTime(t.timeLimit);
 
     const rules = $('intro-rules');
     rules.innerHTML = '';
@@ -145,10 +156,10 @@
           `Tienes <strong>${Math.round(t.timeLimit / 60)} minutos</strong> en total.`,
           'Si el tiempo se agota, el test se envía automáticamente.',
           'Cada pregunta tiene una única respuesta correcta.',
-          'Puedes volver a preguntas anteriores antes de finalizar.'
+          'Cuanto más rápido y acertado, mejor puntuación.'
         ]
       : [
-          `Tienes <strong>${Math.round(t.timeLimit / 60)} minutos</strong>, sin prisa.`,
+          'Sin límite de tiempo: ve a tu ritmo.',
           'No hay respuestas correctas ni incorrectas.',
           'Responde con sinceridad según lo que sueles sentir o hacer.',
           'Puedes volver a preguntas anteriores antes de finalizar.'
@@ -191,20 +202,24 @@
       });
     }
 
+    const timed = isTimed(t);
     run = {
       testId: t.id,
       test: t,
       questions,
       answers: new Array(questions.length).fill(null),
       current: 0,
-      timeLeft: t.timeLimit,
+      timeLeft: timed ? t.timeLimit : 0,
       timerId: null,
       finished: false
     };
 
+    // El reloj solo aparece y corre en los tests cronometrados.
+    $('timer').classList.toggle('hidden', !timed);
+
     showScreen('quiz');
     renderQuestion();
-    startTimer();
+    if (timed) startTimer();
   }
 
   /* ---------------- TEMPORIZADOR ---------------- */
@@ -340,17 +355,18 @@
         detail: `${formatTime(timeUsed)} de ${formatTime(t.timeLimit)} · +${bonusPts} pts por velocidad`
       };
     } else {
-      // Test de atención: base 0..85 por acierto + hasta +15 por velocidad.
+      // Quiz cronometrado (atención, numérico, lógico, cultura):
+      // base 0..85 por acierto + hasta +15 por velocidad.
       const bonus = SPEED.concentrationBonusMax * speed * percent;
       const bonusPts = Math.round(bonus);
       const pts = Math.max(0, Math.min(100, Math.round(percent * 85 + bonus)));
       headline = String(pts);
-      headlineLabel = 'Puntuación de concentración';
-      if (pts >= 85) tier = { label: 'Excelente foco', level: 'high' };
-      else if (pts >= 65) tier = { label: 'Buen foco', level: 'mid-high' };
-      else if (pts >= 40) tier = { label: 'Foco medio', level: 'mid-low' };
-      else tier = { label: 'Foco mejorable', level: 'low' };
-      message = `Has acertado ${correctCount} de ${questions.length} bajo presión de tiempo. La velocidad suma +${bonusPts} puntos.`;
+      headlineLabel = t.scoreLabel || 'Puntuación';
+      if (pts >= 85) tier = { label: 'Excelente', level: 'high' };
+      else if (pts >= 65) tier = { label: 'Muy bien', level: 'mid-high' };
+      else if (pts >= 40) tier = { label: 'Bien', level: 'mid-low' };
+      else tier = { label: 'A mejorar', level: 'low' };
+      message = `Has acertado ${correctCount} de ${questions.length} contrarreloj. La velocidad suma +${bonusPts} puntos.`;
       speedInfo = {
         label: speedLabel(speed),
         detail: `${formatTime(timeUsed)} de ${formatTime(t.timeLimit)} · +${bonusPts} pts por velocidad`
@@ -383,7 +399,7 @@
     };
   }
 
-  function computeScale(t, questions, answers, timeUsed) {
+  function computeScale(t, questions, answers) {
     const dims = {};
     Object.keys(t.dimensions).forEach((k) => (dims[k] = { sum: 0, n: 0 }));
     let answered = 0;
@@ -409,64 +425,40 @@
     }));
 
     let headline, headlineLabel, tier, message;
+    const isSingle = t.single || Object.keys(t.dimensions).length === 1;
 
-    if (t.invertHeadline) {
-      // Test de estrés: una sola dimensión, más alto = peor.
+    if (isSingle) {
+      // Una sola dimensión: nivel Bajo/Moderado/Alto. `highIsGood` decide el color.
       const pct = dimResults[0].pct;
-      headlineLabel = 'Nivel de estrés percibido';
-      if (pct >= 66) {
-        headline = 'Alto';
-        tier = { label: 'Estrés alto', level: 'low' };
-        message = 'Tu nivel de estrés percibido es alto. Cuidarte, descansar y, si lo necesitas, hablar con un profesional o alguien de confianza puede marcar la diferencia.';
-      } else if (pct >= 40) {
-        headline = 'Moderado';
-        tier = { label: 'Estrés moderado', level: 'mid-low' };
-        message = 'Tienes un nivel de estrés moderado. Buenos hábitos de sueño, ejercicio y pausas pueden ayudarte a mantenerlo a raya.';
-      } else {
-        headline = 'Bajo';
-        tier = { label: 'Estrés bajo', level: 'high' };
-        message = '¡Buen trabajo! Percibes un nivel de estrés bajo y sensación de control sobre tu vida.';
-      }
+      const lvl = pct >= 66 ? 'alto' : (pct >= 40 ? 'medio' : 'bajo');
+      headline = lvl === 'alto' ? 'Alto' : (lvl === 'medio' ? 'Moderado' : 'Bajo');
+      headlineLabel = t.headlineLabel || dimResults[0].label;
+      const good = !!t.highIsGood;
+      const level = lvl === 'medio' ? 'mid-low' : (((lvl === 'alto') === good) ? 'high' : 'low');
+      const tl = t.tierLabels || {};
+      tier = { label: tl[lvl] || `${headlineLabel}: ${headline.toLowerCase()}`, level };
+      message = (t.levelMessages && t.levelMessages[lvl]) || '';
     } else {
-      // Rasgo / estilo dominante.
+      // Varias dimensiones: se muestra la dominante.
       const top = dimResults.slice().sort((a, b) => b.pct - a.pct)[0];
       headline = top.label;
-      headlineLabel = t.id === 'vark' ? 'Estilo dominante'
-        : t.id === 'eq' ? 'Fortaleza principal'
-        : 'Rasgo dominante';
+      headlineLabel = t.headlineLabel
+        || (t.id === 'vark' ? 'Estilo dominante' : t.id === 'eq' ? 'Fortaleza principal' : 'Rasgo dominante');
       tier = { label: `${top.pct}% · el más marcado`, level: 'mid' };
-      const verb = t.id === 'vark' ? 'Aprendes mejor de forma'
-        : t.id === 'eq' ? 'Tu mayor fortaleza emocional es la'
-        : 'Tu rasgo más marcado es la';
+      const verb = t.dominantVerb
+        || (t.id === 'vark' ? 'Aprendes mejor de forma' : t.id === 'eq' ? 'Tu mayor fortaleza emocional es la' : 'Tu rasgo más marcado es la');
       message = `${verb} ${top.label.toLowerCase()}. Mira el desglose para ver tu perfil completo.`;
     }
 
-    // El tiempo NO altera el perfil (no tendría base científica); se usa como
-    // indicador de calidad de respuesta (Huang et al., 2012): responder muy
-    // rápido, <2 s por ítem, sugiere poca reflexión.
-    const avgPerItem = answered ? timeUsed / answered : 0;
-    let speedInfo;
-    if (answered >= 3 && avgPerItem < SPEED.carelessSecondsPerItem) {
-      speedInfo = {
-        label: '⚠️ Respuestas muy rápidas',
-        detail: `~${avgPerItem.toFixed(1)} s por pregunta. Por debajo de 2 s suele indicar respuesta poco reflexiva; interpreta el perfil con cautela.`
-      };
-    } else {
-      speedInfo = {
-        label: '✔️ Ritmo de respuesta fiable',
-        detail: `~${avgPerItem.toFixed(1)} s por pregunta.`
-      };
-    }
-
+    // Los tests de escala no tienen cronómetro: el tiempo no influye.
     return {
       testId: t.id, title: t.title, icon: t.icon, type: 'scale',
-      headline, headlineLabel, tier, speedInfo,
+      headline, headlineLabel, tier, speedInfo: null,
       stats: [
-        { label: 'Respondidas', value: `${answered}/${questions.length}` },
-        { label: 'Tiempo usado', value: formatTime(timeUsed) }
+        { label: 'Respondidas', value: `${answered}/${questions.length}` }
       ],
       breakdownTitle: 'Tu perfil',
-      breakdown, message, review: null, timeUsed
+      breakdown, message, review: null
     };
   }
 
@@ -476,10 +468,9 @@
     clearInterval(run.timerId);
 
     const t = run.test;
-    const timeUsed = t.timeLimit - Math.max(0, run.timeLeft);
     const result = t.type === 'quiz'
-      ? computeQuiz(t, run.questions, run.answers, timeUsed)
-      : computeScale(t, run.questions, run.answers, timeUsed);
+      ? computeQuiz(t, run.questions, run.answers, t.timeLimit - Math.max(0, run.timeLeft))
+      : computeScale(t, run.questions, run.answers);
 
     session.results[t.id] = result;
     renderResult(result);
@@ -510,6 +501,7 @@
 
     const stats = $('result-stats');
     stats.innerHTML = '';
+    stats.style.gridTemplateColumns = `repeat(${r.stats.length}, 1fr)`;
     r.stats.forEach((s) => {
       const div = document.createElement('div');
       div.className = 'info-item';
@@ -531,6 +523,9 @@
     });
 
     $('result-message').textContent = r.message || '';
+
+    // La nota de metodología del tiempo solo aplica a tests cronometrados.
+    $('method-box').classList.toggle('hidden', !isTimed(t));
 
     const disc = $('result-disclaimer');
     disc.textContent = t.disclaimer

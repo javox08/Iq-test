@@ -5,19 +5,39 @@ Al terminar puedes recibir un **informe por correo** (o descargarlo).
 
 ## Tests incluidos
 
+**Cognitivos / conocimiento (cronometrados — el tiempo puntúa):**
+
+| Test | Tipo | Mide |
+|------|------|------|
+| 🧠 Coeficiente Intelectual | Quiz | Lógica, matemáticas, patrones y verbal (25 preguntas, 12 min) |
+| 🔢 Razonamiento Numérico | Quiz | Series, cálculo y lógica con números |
+| 🧩 Razonamiento Lógico | Quiz | Acertijos y deducciones |
+| 🎯 Atención y Concentración | Quiz | Foco, detalle y velocidad |
+| 🌍 Cultura General | Quiz | Geografía, ciencia, historia y arte |
+
+**Personalidad / bienestar (sin cronómetro — a tu ritmo):**
+
 | Test | Tipo | Mide |
 |------|------|------|
 | 🎭 Personalidad (Big Five) | Escala | Apertura, responsabilidad, extraversión, amabilidad, estabilidad |
 | 💗 Inteligencia Emocional | Escala | Autoconciencia, autorregulación, motivación, empatía, habilidades sociales |
+| 🔗 Estilo de Apego | Escala | Seguro, ansioso, evitativo |
+| 💬 Estilo de Comunicación | Escala | Asertivo, pasivo, agresivo |
+| 🌟 Autoestima | Escala | Nivel de autoestima |
+| ☀️ Optimismo | Escala | Optimismo vs. pesimismo |
+| 🌱 Resiliencia | Escala | Capacidad de recuperación (enfoque en fortalezas, no en trauma) |
 | 📚 Estilo de Aprendizaje (VARK) | Escala | Visual, auditivo, lectura/escritura, kinestésico |
 | 🧘 Estrés y Bienestar | Escala | Nivel de estrés percibido |
-| 🎯 Atención y Concentración | Quiz | Foco, detalle y velocidad (contrarreloj) |
-| 🧠 Coeficiente Intelectual | Quiz | Lógica, matemáticas, patrones, razonamiento verbal (25 preguntas, 12 min) |
+
+> Los tests de escala **no tienen cronómetro** (el tiempo no cambia el resultado: se hacen a
+> tu ritmo). Solo los tests de capacidad son cronometrados, porque ahí la velocidad sí puntúa.
+> El apartado de "trauma" se trata como **Resiliencia** (en positivo), no como una medida
+> clínica de trauma.
 
 - **Banco de preguntas que cambia:** cada test tiene un banco (pool) más grande que el
   número de preguntas mostradas. En cada intento se **barajan las preguntas y las opciones**
   y se elige un subconjunto, así que casi nunca sale igual dos veces.
-- **Cronómetro** por test; si se agota, se envía automáticamente.
+- **Cronómetro** solo en los tests de capacidad; si se agota, se envía automáticamente.
 - **Informe** que agrupa todos los tests hechos en la sesión, enviable por correo o descargable.
 
 > ⚠️ Todos los tests son **recreativos y orientativos**. No son instrumentos clínicos ni
