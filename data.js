@@ -42,6 +42,10 @@
       timeLimit: 720,
       pick: 25,
       scoring: 'iq',
+      // Muestreo estratificado por dificultad (1 fácil/media, 2 media-alta, 3 difícil):
+      // cada intento saca la misma mezcla, como en un test real. La dificultad también
+      // pondera la puntuación (acertar preguntas difíciles vale más).
+      mix: { 1: 15, 2: 3, 3: 7 },
       pool: [
         // ---- LÓGICA ----
         { category: 'Lógica', text: 'Completa la secuencia: 2, 4, 8, 16, ?', options: ['24', '30', '32', '20'], correct: 2, explanation: 'Cada número se multiplica por 2, así que sigue el 32.' },
@@ -50,12 +54,12 @@
         { category: 'Lógica', text: '¿Qué número no pertenece al grupo? 3, 5, 7, 10, 11', options: ['3', '7', '10', '11'], correct: 2, explanation: '3, 5, 7 y 11 son impares (y primos); 10 es el único par.' },
         { category: 'Lógica', text: 'Si hoy es miércoles, ¿qué día será dentro de 100 días?', options: ['Jueves', 'Viernes', 'Sábado', 'Domingo'], correct: 1, explanation: '100 ÷ 7 deja resto 2; dos días después del miércoles es viernes.' },
         { category: 'Lógica', text: 'Algunos gatos son negros y todos los negros son rápidos. ¿Qué es seguro?', options: ['Todos los gatos son rápidos', 'Algunos gatos son rápidos', 'Ningún gato es rápido', 'Todos los rápidos son gatos'], correct: 1, explanation: 'Solo se sabe que los gatos negros son rápidos, luego "algunos gatos son rápidos".' },
-        { category: 'Lógica', text: 'Un reloj marca las 3:15. ¿Qué ángulo forman las agujas (aprox.)?', options: ['0°', '7,5°', '30°', '45°'], correct: 1, explanation: 'A las 3:15 el minutero está en el 3 y la aguja horaria un cuarto pasada: se separan 7,5°.' },
+        { category: 'Lógica', text: 'Un reloj marca las 3:15. ¿Qué ángulo forman las agujas (aprox.)?', options: ['0°', '7,5°', '30°', '45°'], correct: 1, explanation: 'A las 3:15 el minutero está en el 3 y la aguja horaria un cuarto pasada: se separan 7,5°.', difficulty: 3 },
         { category: 'Lógica', text: 'Guante es a mano como zapato es a...', options: ['Calcetín', 'Pie', 'Suela', 'Cordón'], correct: 1, explanation: 'El guante cubre la mano igual que el zapato cubre el pie.' },
         { category: 'Lógica', text: 'Si todos los A son B y ningún B es C, ¿qué es cierto?', options: ['Todos los A son C', 'Ningún A es C', 'Algún A es C', 'No se puede saber'], correct: 1, explanation: 'Si A está dentro de B y B no toca a C, entonces A tampoco toca a C.' },
         { category: 'Lógica', text: 'En una carrera adelantas al que va segundo. ¿En qué posición vas ahora?', options: ['Primero', 'Segundo', 'Tercero', 'Último'], correct: 1, explanation: 'Al adelantar al segundo ocupas su lugar: quedas segundo, no primero.' },
         { category: 'Lógica', text: 'El padre de Ana tiene cinco hijas: Lala, Lele, Lili, Lolo y... ¿cómo se llama la quinta?', options: ['Lulu', 'Ana', 'Lala', 'No se sabe'], correct: 1, explanation: 'El enunciado empieza "El padre de Ana...": la quinta hija es Ana.' },
-        { category: 'Lógica', text: 'Un caracol sube 3 m de día y resbala 2 m de noche en un pozo de 5 m. ¿En cuántos días sale?', options: ['3 días', '4 días', '5 días', '6 días'], correct: 0, explanation: 'Cada día neto sube 1 m, pero el tercer día trepa 3 m desde los 2 m y alcanza los 5 m.' },
+        { category: 'Lógica', text: 'Un caracol sube 3 m de día y resbala 2 m de noche en un pozo de 5 m. ¿En cuántos días sale?', options: ['3 días', '4 días', '5 días', '6 días'], correct: 0, explanation: 'Cada día neto sube 1 m, pero el tercer día trepa 3 m desde los 2 m y alcanza los 5 m.', difficulty: 3 },
         { category: 'Lógica', text: 'Antonio es mayor que Bruno pero menor que Carlos. ¿Quién es el mayor?', options: ['Antonio', 'Bruno', 'Carlos', 'Iguales'], correct: 2, explanation: 'Carlos es mayor que Antonio, que a su vez es mayor que Bruno: Carlos es el mayor.' },
 
         // ---- MATEMÁTICAS ----
@@ -68,8 +72,8 @@
         { category: 'Matemáticas', text: '¿Cuál es el 25% de 240?', options: ['48', '60', '72', '80'], correct: 1, explanation: '240 ÷ 4 = 60.' },
         { category: 'Matemáticas', text: 'Serie: 100, 50, 25, 12,5, ?', options: ['6', '6,25', '8', '5'], correct: 1, explanation: 'Cada término es la mitad del anterior: 12,5 ÷ 2 = 6,25.' },
         { category: 'Matemáticas', text: '¿Cuánto es la mitad de 2 elevado a 10?', options: ['256', '512', '1024', '500'], correct: 1, explanation: '2¹⁰ = 1024; su mitad es 512.' },
-        { category: 'Matemáticas', text: 'Un producto sube un 10% y luego baja un 10%. ¿Cómo queda respecto al precio inicial?', options: ['Igual', '1% menos', '1% más', '10% menos'], correct: 1, explanation: '1,1 × 0,9 = 0,99: queda un 1% por debajo del precio inicial.' },
-        { category: 'Matemáticas', text: 'Si 5 máquinas hacen 5 piezas en 5 minutos, ¿cuánto tardan 100 máquinas en hacer 100 piezas?', options: ['5 minutos', '100 minutos', '20 minutos', '1 minuto'], correct: 0, explanation: 'Cada máquina tarda 5 min por pieza; 100 máquinas hacen 100 piezas también en 5 minutos.' },
+        { category: 'Matemáticas', text: 'Un producto sube un 10% y luego baja un 10%. ¿Cómo queda respecto al precio inicial?', options: ['Igual', '1% menos', '1% más', '10% menos'], correct: 1, explanation: '1,1 × 0,9 = 0,99: queda un 1% por debajo del precio inicial.', difficulty: 3 },
+        { category: 'Matemáticas', text: 'Si 5 máquinas hacen 5 piezas en 5 minutos, ¿cuánto tardan 100 máquinas en hacer 100 piezas?', options: ['5 minutos', '100 minutos', '20 minutos', '1 minuto'], correct: 0, explanation: 'Cada máquina tarda 5 min por pieza; 100 máquinas hacen 100 piezas también en 5 minutos.', difficulty: 3 },
         { category: 'Matemáticas', text: 'La suma de tres números consecutivos es 72. ¿Cuál es el mayor?', options: ['24', '25', '23', '26'], correct: 1, explanation: '3n = 72 → n = 24; los números son 23, 24 y 25, así que el mayor es 25.' },
         { category: 'Matemáticas', text: 'Un reloj se atrasa 5 minutos cada hora. Tras 12 horas, ¿cuánto se ha atrasado?', options: ['30 min', '45 min', '60 min', '12 min'], correct: 2, explanation: '5 min × 12 h = 60 minutos de atraso.' },
 
@@ -79,14 +83,14 @@
         { category: 'Patrones', text: 'Sigue el patrón: Círculo, Cuadrado, Triángulo, Círculo, Cuadrado, ?', options: ['Círculo', 'Cuadrado', 'Triángulo', 'Rombo'], correct: 2, explanation: 'El ciclo de tres figuras se repite; toca el triángulo.' },
         { category: 'Patrones', text: 'Completa la secuencia: 1, 4, 9, 16, 25, ?', options: ['30', '32', '36', '49'], correct: 2, explanation: 'Son cuadrados: 1², 2², 3², 4², 5² y 6² = 36.' },
         { category: 'Patrones', text: 'Completa la secuencia de letras: Z, Y, X, W, ?', options: ['U', 'V', 'T', 'S'], correct: 1, explanation: 'El abecedario va hacia atrás: X, W, V.' },
-        { category: 'Patrones', text: 'Serie: 3, 6, 5, 10, 9, 18, ?', options: ['16', '17', '20', '27'], correct: 1, explanation: 'Se alterna ×2 y −1: tras 18 viene 18 − 1 = 17.' },
+        { category: 'Patrones', text: 'Serie: 3, 6, 5, 10, 9, 18, ?', options: ['16', '17', '20', '27'], correct: 1, explanation: 'Se alterna ×2 y −1: tras 18 viene 18 − 1 = 17.', difficulty: 3 },
         { category: 'Patrones', text: '¿Qué número sigue? 1, 2, 4, 7, 11, ?', options: ['14', '15', '16', '18'], correct: 2, explanation: 'Se suma 1, 2, 3, 4, 5: 11 + 5 = 16.' },
         { category: 'Patrones', text: 'Completa: AZ, BY, CX, ?', options: ['DV', 'DW', 'EW', 'DX'], correct: 1, explanation: 'La primera letra avanza (A, B, C, D) y la segunda retrocede (Z, Y, X, W).' },
         { category: 'Patrones', text: 'Completa la serie: 2, 3, 5, 7, 11, ?', options: ['12', '13', '14', '15'], correct: 1, explanation: 'Es la serie de números primos: el siguiente es 13.' },
         { category: 'Patrones', text: 'Completa la serie: 1, 8, 27, 64, ?', options: ['100', '125', '81', '216'], correct: 1, explanation: 'Son cubos: 1³, 2³, 3³, 4³ y 5³ = 125.' },
-        { category: 'Patrones', text: 'Completa la serie: 100, 96, 88, 76, 60, ?', options: ['40', '44', '48', '36'], correct: 0, explanation: 'Se resta 4, 8, 12, 16, 20: 60 − 20 = 40.' },
+        { category: 'Patrones', text: 'Completa la serie: 100, 96, 88, 76, 60, ?', options: ['40', '44', '48', '36'], correct: 0, explanation: 'Se resta 4, 8, 12, 16, 20: 60 − 20 = 40.', difficulty: 3 },
         { category: 'Patrones', text: 'Completa la serie: 3, 9, 27, 81, ?', options: ['162', '243', '216', '324'], correct: 1, explanation: 'Cada término se multiplica por 3: 81 × 3 = 243.' },
-        { category: 'Patrones', text: 'Serie difícil: 1, 4, 27, 256, ?', options: ['625', '3125', '1024', '512'], correct: 1, explanation: 'El patrón es n elevado a n: 1¹, 2², 3³, 4⁴ y 5⁵ = 3125.' },
+        { category: 'Patrones', text: 'Serie difícil: 1, 4, 27, 256, ?', options: ['625', '3125', '1024', '512'], correct: 1, explanation: 'El patrón es n elevado a n: 1¹, 2², 3³, 4⁴ y 5⁵ = 3125.', difficulty: 3 },
 
         // ---- VERBAL ----
         { category: 'Verbal', text: 'Perro es a Cachorro como Gato es a...', options: ['Felino', 'Gatito', 'Maullido', 'Ratón'], correct: 1, explanation: 'El gatito es la cría del gato, como el cachorro lo es del perro.' },
@@ -101,7 +105,27 @@
         { category: 'Verbal', text: 'Cachorro es a Perro como Potro es a...', options: ['Vaca', 'Caballo', 'Oveja', 'Cerdo'], correct: 1, explanation: 'El potro es la cría del caballo, como el cachorro lo es del perro.' },
         { category: 'Verbal', text: '¿Cuál es el sinónimo de "meticuloso"?', options: ['Descuidado', 'Minucioso', 'Rápido', 'Torpe'], correct: 1, explanation: 'Meticuloso significa que cuida los detalles: minucioso.' },
         { category: 'Verbal', text: '¿Qué palabra no pertenece al grupo?', options: ['Alegre', 'Contento', 'Triste', 'Dichoso'], correct: 2, explanation: 'Alegre, contento y dichoso expresan felicidad; triste es lo contrario.' },
-        { category: 'Verbal', text: 'Reloj es a Tiempo como Termómetro es a...', options: ['Calor', 'Temperatura', 'Fiebre', 'Grados'], correct: 1, explanation: 'El termómetro mide la temperatura, como el reloj mide el tiempo.' }
+        { category: 'Verbal', text: 'Reloj es a Tiempo como Termómetro es a...', options: ['Calor', 'Temperatura', 'Fiebre', 'Grados'], correct: 1, explanation: 'El termómetro mide la temperatura, como el reloj mide el tiempo.' },
+
+        // ---- NUEVAS: dificultad media (2) ----
+        { category: 'Verbal', text: '¿Cuál es el sinónimo de "sagaz"?', options: ['Torpe', 'Astuto', 'Lento', 'Ingenuo'], correct: 1, explanation: 'Sagaz significa astuto, listo y perspicaz.', difficulty: 2 },
+        { category: 'Verbal', text: '¿Cuál es el antónimo de "humilde"?', options: ['Modesto', 'Sencillo', 'Soberbio', 'Tímido'], correct: 2, explanation: 'Humilde es modesto; su contrario es soberbio u orgulloso.', difficulty: 2 },
+        { category: 'Verbal', text: 'Oír es a Escuchar como Ver es a...', options: ['Mirar', 'Vislumbrar', 'Ojo', 'Luz'], correct: 0, explanation: 'Escuchar es oír con atención, como mirar es ver con atención.', difficulty: 2 },
+        { category: 'Lógica', text: 'Si ayer fue jueves, ¿qué día será mañana?', options: ['Viernes', 'Sábado', 'Domingo', 'Jueves'], correct: 1, explanation: 'Ayer jueves → hoy viernes → mañana sábado.', difficulty: 2 },
+        { category: 'Patrones', text: 'Serie: 7, 10, 8, 11, 9, 12, ?', options: ['10', '13', '14', '8'], correct: 0, explanation: 'Se alterna +3 y −2: tras 12 viene 12 − 2 = 10.', difficulty: 2 },
+        { category: 'Matemáticas', text: '¿Cuál es el número primo siguiente a 13?', options: ['15', '16', '17', '19'], correct: 2, explanation: '14, 15 y 16 no son primos; el siguiente primo es 17.', difficulty: 2 },
+
+        // ---- NUEVAS: dificultad alta (3) ----
+        { category: 'Lógica', text: 'Si MAR se codifica 13-1-18 (posición en el abecedario), ¿cómo se codifica SOL?', options: ['19-15-12', '18-14-11', '20-16-13', '19-16-12'], correct: 0, explanation: 'S=19, O=15, L=12 según su posición en el abecedario.', difficulty: 3 },
+        { category: 'Matemáticas', text: '¿Cuánto suman todos los números del 1 al 100?', options: ['5000', '5050', '5100', '10000'], correct: 1, explanation: 'Suma de Gauss: 100 × 101 ÷ 2 = 5050.', difficulty: 3 },
+        { category: 'Matemáticas', text: 'Serie: 1, 2, 6, 24, 120, ?', options: ['360', '600', '720', '840'], correct: 2, explanation: 'Se multiplica por 2, 3, 4, 5 y 6: 120 × 6 = 720.', difficulty: 3 },
+        { category: 'Matemáticas', text: 'Un artículo de 120 € sube un 25% y luego baja un 20%. ¿Precio final?', options: ['110 €', '120 €', '125 €', '130 €'], correct: 1, explanation: '120 × 1,25 = 150; 150 × 0,8 = 120 €.', difficulty: 3 },
+        { category: 'Lógica', text: 'Ana, Beto y Cora tienen un perro, un gato y un pez. Ana no tiene perro ni pez y Beto no tiene pez. ¿Qué tiene Cora?', options: ['Perro', 'Gato', 'Pez', 'No se sabe'], correct: 2, explanation: 'Ana tiene gato; Beto, al no tener pez, tiene perro; a Cora le queda el pez.', difficulty: 3 },
+        { category: 'Matemáticas', text: 'Si x + y = 10 y x − y = 4, ¿cuánto vale x?', options: ['6', '7', '8', '5'], correct: 1, explanation: 'Sumando las dos ecuaciones: 2x = 14, así que x = 7.', difficulty: 3 },
+        { category: 'Lógica', text: 'En una reunión de 5 personas, cada una saluda a las demás con un apretón de manos. ¿Cuántos apretones hay en total?', options: ['10', '20', '15', '25'], correct: 0, explanation: 'Son las combinaciones de 5 en 2: 5 × 4 ÷ 2 = 10.', difficulty: 3 },
+        { category: 'Patrones', text: 'Serie: 0, 1, 1, 2, 4, 7, 13, ?', options: ['20', '22', '24', '26'], correct: 2, explanation: 'Cada término es la suma de los tres anteriores: 4 + 7 + 13 = 24.', difficulty: 3 },
+        { category: 'Matemáticas', text: 'Si el 15% de un número es 30, ¿cuánto es el 40% de ese número?', options: ['60', '75', '80', '90'], correct: 2, explanation: '15% = 30 → el número es 200; el 40% de 200 es 80.', difficulty: 3 },
+        { category: 'Patrones', text: 'Serie: 2, 5, 11, 23, 47, ?', options: ['93', '95', '94', '96'], correct: 1, explanation: 'Cada término es el doble del anterior más 1: 47 × 2 + 1 = 95.', difficulty: 3 }
       ]
     },
 
@@ -278,10 +302,11 @@
       pick: 10,
       scoring: 'percent',
       scoreLabel: 'Puntuación de concentración',
+      mix: { 1: 6, 2: 4 },
       pool: [
-        { category: 'Atención', text: '¿Cuántas veces aparece la letra «a» en: «Ana canta una canción»?', options: ['4', '5', '6', '7'], correct: 2, explanation: 'Ana(2) + canta(2) + una(1) + canción(1) = 6.' },
-        { category: 'Atención', text: '¿Cuál no encaja? 121, 144, 169, 150, 196', options: ['121', '150', '169', '196'], correct: 1, explanation: '121, 144, 169 y 196 son cuadrados perfectos; 150 no lo es.' },
-        { category: 'Atención', text: '¿Cuántos «7» hay en la serie? 7 1 7 4 7 9 2 7 5 7', options: ['4', '5', '6', '3'], correct: 1, explanation: 'Aparece cinco veces (posiciones 1, 3, 5, 8 y 10).' },
+        { category: 'Atención', text: '¿Cuántas veces aparece la letra «a» en: «Ana canta una canción»?', options: ['4', '5', '6', '7'], correct: 2, explanation: 'Ana(2) + canta(2) + una(1) + canción(1) = 6.', difficulty: 2 },
+        { category: 'Atención', text: '¿Cuál no encaja? 121, 144, 169, 150, 196', options: ['121', '150', '169', '196'], correct: 1, explanation: '121, 144, 169 y 196 son cuadrados perfectos; 150 no lo es.', difficulty: 2 },
+        { category: 'Atención', text: '¿Cuántos «7» hay en la serie? 7 1 7 4 7 9 2 7 5 7', options: ['4', '5', '6', '3'], correct: 1, explanation: 'Aparece cinco veces (posiciones 1, 3, 5, 8 y 10).', difficulty: 2 },
         { category: 'Atención', text: 'Si la palabra ROJO está escrita en tinta azul, ¿de qué color es la tinta?', options: ['Rojo', 'Azul', 'Verde', 'Negro'], correct: 1, explanation: 'La pregunta es por el color de la tinta, que es azul.' },
         { category: 'Atención', text: '¿Cuál es el siguiente? 3, 6, 9, 12, ?', options: ['13', '14', '15', '18'], correct: 2, explanation: 'Van de 3 en 3: sigue el 15.' },
         { category: 'Atención', text: '¿Cuál de estas palabras está escrita incorrectamente?', options: ['Aeropuerto', 'Aereopuerto', 'Almohada', 'Zanahoria'], correct: 1, explanation: 'Se escribe "aeropuerto", sin la segunda "e".' },
@@ -289,11 +314,16 @@
         { category: 'Atención', text: '¿Cuántas vocales tiene la palabra «MURCIÉLAGO»?', options: ['4', '5', '6', '3'], correct: 1, explanation: 'u, i, é, a, o: cinco vocales.' },
         { category: 'Atención', text: 'Rápido: 8 × 7 = ?', options: ['54', '56', '63', '48'], correct: 1, explanation: '8 × 7 = 56.' },
         { category: 'Atención', text: '¿Qué número falta? 2, 4, __, 8, 10', options: ['5', '6', '7', '3'], correct: 1, explanation: 'Van de 2 en 2: falta el 6.' },
-        { category: 'Atención', text: '¿Cuál es el mayor? 0,7 · 0,68 · 0,702 · 0,79', options: ['0,7', '0,68', '0,702', '0,79'], correct: 3, explanation: '0,79 es el mayor de los cuatro.' },
+        { category: 'Atención', text: '¿Cuál es el mayor? 0,7 · 0,68 · 0,702 · 0,79', options: ['0,7', '0,68', '0,702', '0,79'], correct: 3, explanation: '0,79 es el mayor de los cuatro.', difficulty: 2 },
         { category: 'Atención', text: 'Lee con atención: «Todos menos Juan aprobaron». ¿Quién NO aprobó?', options: ['Todos', 'Juan', 'Nadie', 'No se sabe'], correct: 1, explanation: '"Todos menos Juan" indica que Juan es el único que no aprobó.' },
-        { category: 'Atención', text: '¿Cuántas letras «e» hay en «excelente experiencia»?', options: ['6', '7', '8', '5'], correct: 1, explanation: 'excelente(4) + experiencia(3) = 7.' },
+        { category: 'Atención', text: '¿Cuántas letras «e» hay en «excelente experiencia»?', options: ['6', '7', '8', '5'], correct: 1, explanation: 'excelente(4) + experiencia(3) = 7.', difficulty: 2 },
         { category: 'Atención', text: 'Serie: 1, 2, 4, 7, 11, ?', options: ['14', '15', '16', '18'], correct: 2, explanation: 'Se suma 1, 2, 3, 4, 5: 11 + 5 = 16.' },
-        { category: 'Atención', text: '¿Cuál es distinto? gato, perro, león, mesa, caballo', options: ['gato', 'león', 'mesa', 'caballo'], correct: 2, explanation: 'Todos son animales excepto la mesa.' }
+        { category: 'Atención', text: '¿Cuál es distinto? gato, perro, león, mesa, caballo', options: ['gato', 'león', 'mesa', 'caballo'], correct: 2, explanation: 'Todos son animales excepto la mesa.' },
+        { category: 'Atención', text: '¿Cuántas palabras tiene esta pregunta?', options: ['4', '5', '6', '7'], correct: 1, explanation: 'Cuántas-palabras-tiene-esta-pregunta: 5 palabras.', difficulty: 2 },
+        { category: 'Atención', text: 'Si AYER era martes, ¿qué día es HOY?', options: ['Lunes', 'Martes', 'Miércoles', 'Jueves'], correct: 2, explanation: 'El día siguiente al martes es miércoles.' },
+        { category: 'Atención', text: '¿Qué es mayor: 3/4 o 0,8?', options: ['3/4', '0,8', 'Son iguales', 'No se puede saber'], correct: 1, explanation: '3/4 = 0,75, que es menor que 0,8.', difficulty: 2 },
+        { category: 'Atención', text: '¿Cuántos números pares hay en: 3, 8, 5, 12, 7, 6, 9?', options: ['2', '3', '4', '5'], correct: 1, explanation: 'Los pares son 8, 12 y 6: tres.' },
+        { category: 'Atención', text: 'Si lees «AMOR» al revés, ¿qué palabra obtienes?', options: ['ROMA', 'OMAR', 'RAMO', 'MORA'], correct: 0, explanation: 'A-M-O-R leído al revés es R-O-M-A.' }
       ]
     },
 
@@ -309,25 +339,31 @@
       pick: 12,
       scoring: 'percent',
       scoreLabel: 'Puntuación numérica',
+      mix: { 1: 8, 2: 4 },
       pool: [
         { category: 'Numérico', text: '¿Qué número sigue? 3, 6, 9, 12, ?', options: ['13', '15', '18', '21'], correct: 1, explanation: 'Van de 3 en 3: sigue el 15.' },
         { category: 'Numérico', text: 'Serie: 5, 10, 20, 40, ?', options: ['60', '70', '80', '100'], correct: 2, explanation: 'Cada término se multiplica por 2: 40 × 2 = 80.' },
         { category: 'Numérico', text: '¿Cuánto es 12 × 12?', options: ['124', '132', '144', '154'], correct: 2, explanation: '12 × 12 = 144.' },
         { category: 'Numérico', text: 'Si un lápiz cuesta 0,50 €, ¿cuánto cuestan 6?', options: ['2,50 €', '3 €', '3,50 €', '6 €'], correct: 1, explanation: '0,50 × 6 = 3 €.' },
         { category: 'Numérico', text: '¿Cuál es par y múltiplo de 5? 12, 15, 20, 27', options: ['12', '15', '20', '27'], correct: 2, explanation: '20 es par y acaba en 0, así que es múltiplo de 5.' },
-        { category: 'Numérico', text: '1000 ÷ 8 = ?', options: ['120', '125', '128', '150'], correct: 1, explanation: '1000 ÷ 8 = 125.' },
+        { category: 'Numérico', text: '1000 ÷ 8 = ?', options: ['120', '125', '128', '150'], correct: 1, explanation: '1000 ÷ 8 = 125.', difficulty: 2 },
         { category: 'Numérico', text: 'Serie: 2, 4, 8, 16, 32, ?', options: ['48', '56', '64', '72'], correct: 2, explanation: 'Se duplica cada vez: 32 × 2 = 64.' },
         { category: 'Numérico', text: '¿Cuánto es el 10% de 350?', options: ['30', '35', '40', '45'], correct: 1, explanation: '350 ÷ 10 = 35.' },
         { category: 'Numérico', text: 'Serie: 7, 14, 28, 56, ?', options: ['96', '102', '112', '128'], correct: 2, explanation: 'Se multiplica por 2: 56 × 2 = 112.' },
         { category: 'Numérico', text: 'Si 4 kg de manzanas cuestan 8 €, ¿cuánto cuesta 1 kg?', options: ['1 €', '2 €', '3 €', '4 €'], correct: 1, explanation: '8 € ÷ 4 kg = 2 € por kilo.' },
-        { category: 'Numérico', text: 'Serie: 1, 3, 6, 10, 15, ?', options: ['18', '20', '21', '25'], correct: 2, explanation: 'Se suma 2, 3, 4, 5, 6: 15 + 6 = 21.' },
+        { category: 'Numérico', text: 'Serie: 1, 3, 6, 10, 15, ?', options: ['18', '20', '21', '25'], correct: 2, explanation: 'Se suma 2, 3, 4, 5, 6: 15 + 6 = 21.', difficulty: 2 },
         { category: 'Numérico', text: '¿Cuánto es 9²?', options: ['72', '81', '90', '99'], correct: 1, explanation: '9 × 9 = 81.' },
         { category: 'Numérico', text: '¿Cuántos minutos hay en 2,5 horas?', options: ['120', '140', '150', '160'], correct: 2, explanation: '2,5 × 60 = 150 minutos.' },
-        { category: 'Numérico', text: 'Serie: 81, 27, 9, 3, ?', options: ['0', '1', '2', '3'], correct: 1, explanation: 'Se divide entre 3: 3 ÷ 3 = 1.' },
+        { category: 'Numérico', text: 'Serie: 81, 27, 9, 3, ?', options: ['0', '1', '2', '3'], correct: 1, explanation: 'Se divide entre 3: 3 ÷ 3 = 1.', difficulty: 2 },
         { category: 'Numérico', text: 'El doble de 45 más 10 = ?', options: ['90', '95', '100', '110'], correct: 2, explanation: '45 × 2 = 90; 90 + 10 = 100.' },
         { category: 'Numérico', text: '¿Qué número al cuadrado da 64?', options: ['6', '7', '8', '9'], correct: 2, explanation: '8 × 8 = 64.' },
         { category: 'Numérico', text: '¿Cuánto es 3/4 de 100?', options: ['65', '70', '75', '80'], correct: 2, explanation: '100 × 3 ÷ 4 = 75.' },
-        { category: 'Numérico', text: 'Serie: 100, 90, 81, 73, ?', options: ['64', '66', '68', '70'], correct: 1, explanation: 'Se resta 10, 9, 8, 7: 73 − 7 = 66.' }
+        { category: 'Numérico', text: 'Serie: 100, 90, 81, 73, ?', options: ['64', '66', '68', '70'], correct: 1, explanation: 'Se resta 10, 9, 8, 7: 73 − 7 = 66.', difficulty: 2 },
+        { category: 'Numérico', text: '¿Cuánto es 6 × 7 + 3?', options: ['42', '45', '48', '39'], correct: 1, explanation: '6 × 7 = 42; 42 + 3 = 45.' },
+        { category: 'Numérico', text: 'Serie: 3, 7, 15, 31, ?', options: ['47', '55', '63', '62'], correct: 2, explanation: 'Cada término es el doble del anterior más 1: 31 × 2 + 1 = 63.', difficulty: 2 },
+        { category: 'Numérico', text: '¿Cuánto es el 20% de 150?', options: ['25', '30', '35', '40'], correct: 1, explanation: '150 ÷ 5 = 30.' },
+        { category: 'Numérico', text: 'Serie: 64, 32, 16, 8, ?', options: ['2', '4', '6', '8'], correct: 1, explanation: 'Se divide entre 2: 8 ÷ 2 = 4.' },
+        { category: 'Numérico', text: 'Si compro 3 cafés a 1,20 € cada uno, ¿cuánto pago?', options: ['3 €', '3,40 €', '3,60 €', '4 €'], correct: 2, explanation: '1,20 × 3 = 3,60 €.' }
       ]
     },
 
@@ -343,21 +379,30 @@
       pick: 12,
       scoring: 'percent',
       scoreLabel: 'Puntuación lógica',
+      mix: { 1: 5, 2: 5, 3: 2 },
       pool: [
         { category: 'Lógico', text: 'Si A es mayor que B y B es mayor que C, ¿quién es el menor?', options: ['A', 'B', 'C', 'Iguales'], correct: 2, explanation: 'El orden es A > B > C, así que C es el menor.' },
-        { category: 'Lógico', text: 'En un cajón a oscuras hay calcetines negros y blancos. ¿Cuántos sacas como mínimo para tener un par del mismo color?', options: ['2', '3', '4', '5'], correct: 1, explanation: 'Con 3 calcetines y solo 2 colores, al menos dos coinciden.' },
+        { category: 'Lógico', text: 'En un cajón a oscuras hay calcetines negros y blancos. ¿Cuántos sacas como mínimo para tener un par del mismo color?', options: ['2', '3', '4', '5'], correct: 1, explanation: 'Con 3 calcetines y solo 2 colores, al menos dos coinciden.', difficulty: 2 },
         { category: 'Lógico', text: 'Si mañana es domingo, ¿qué día fue ayer?', options: ['Jueves', 'Viernes', 'Sábado', 'Domingo'], correct: 1, explanation: 'Si mañana es domingo, hoy es sábado y ayer fue viernes.' },
-        { category: 'Lógico', text: 'Un ladrillo pesa 1 kg más medio ladrillo. ¿Cuánto pesa el ladrillo?', options: ['1 kg', '1,5 kg', '2 kg', '3 kg'], correct: 2, explanation: 'L = 1 + L/2 → L/2 = 1 → L = 2 kg.' },
-        { category: 'Lógico', text: 'Pedro tiene el doble de años que Ana. Juntos suman 30. ¿Cuántos tiene Ana?', options: ['8', '10', '12', '15'], correct: 1, explanation: 'Ana + 2·Ana = 30 → 3·Ana = 30 → Ana = 10.' },
-        { category: 'Lógico', text: 'Si algunos X son Y y todos los Y son Z, ¿algunos X son Z?', options: ['Sí', 'No', 'Nunca', 'No se puede saber'], correct: 0, explanation: 'Los X que son Y también son Z, así que sí.' },
+        { category: 'Lógico', text: 'Un ladrillo pesa 1 kg más medio ladrillo. ¿Cuánto pesa el ladrillo?', options: ['1 kg', '1,5 kg', '2 kg', '3 kg'], correct: 2, explanation: 'L = 1 + L/2 → L/2 = 1 → L = 2 kg.', difficulty: 3 },
+        { category: 'Lógico', text: 'Pedro tiene el doble de años que Ana. Juntos suman 30. ¿Cuántos tiene Ana?', options: ['8', '10', '12', '15'], correct: 1, explanation: 'Ana + 2·Ana = 30 → 3·Ana = 30 → Ana = 10.', difficulty: 2 },
+        { category: 'Lógico', text: 'Si algunos X son Y y todos los Y son Z, ¿algunos X son Z?', options: ['Sí', 'No', 'Nunca', 'No se puede saber'], correct: 0, explanation: 'Los X que son Y también son Z, así que sí.', difficulty: 2 },
         { category: 'Lógico', text: '¿Cuál es el intruso? Manzana, Pera, Zanahoria, Plátano', options: ['Manzana', 'Pera', 'Zanahoria', 'Plátano'], correct: 2, explanation: 'Las demás son frutas; la zanahoria es una verdura.' },
         { category: 'Lógico', text: 'Si hoy es lunes, ¿qué día será pasado mañana?', options: ['Martes', 'Miércoles', 'Jueves', 'Domingo'], correct: 1, explanation: 'Pasado mañana son dos días: martes y miércoles.' },
-        { category: 'Lógico', text: 'Tres gatos cazan 3 ratones en 3 minutos. ¿Cuánto tardan 100 gatos en cazar 100 ratones?', options: ['3 minutos', '100 minutos', '33 minutos', '1 minuto'], correct: 0, explanation: 'Cada gato caza 1 ratón en 3 min; 100 gatos cazan 100 ratones también en 3 min.' },
-        { category: 'Lógico', text: '¿Cuántos meses del año tienen 28 días?', options: ['1', '2', '7', '12'], correct: 3, explanation: 'Todos los meses tienen al menos 28 días.' },
+        { category: 'Lógico', text: 'Tres gatos cazan 3 ratones en 3 minutos. ¿Cuánto tardan 100 gatos en cazar 100 ratones?', options: ['3 minutos', '100 minutos', '33 minutos', '1 minuto'], correct: 0, explanation: 'Cada gato caza 1 ratón en 3 min; 100 gatos cazan 100 ratones también en 3 min.', difficulty: 3 },
+        { category: 'Lógico', text: '¿Cuántos meses del año tienen 28 días?', options: ['1', '2', '7', '12'], correct: 3, explanation: 'Todos los meses tienen al menos 28 días.', difficulty: 2 },
         { category: 'Lógico', text: 'Empiezas mirando al norte y giras 180°. ¿Hacia dónde miras?', options: ['Norte', 'Sur', 'Este', 'Oeste'], correct: 1, explanation: 'Media vuelta desde el norte te deja mirando al sur.' },
-        { category: 'Lógico', text: 'Un granjero tiene 17 ovejas y todas menos 9 se escapan. ¿Cuántas quedan?', options: ['8', '9', '17', '0'], correct: 1, explanation: '"Todas menos 9" son las que quedan: 9.' },
+        { category: 'Lógico', text: 'Un granjero tiene 17 ovejas y todas menos 9 se escapan. ¿Cuántas quedan?', options: ['8', '9', '17', '0'], correct: 1, explanation: '"Todas menos 9" son las que quedan: 9.', difficulty: 2 },
         { category: 'Lógico', text: '¿Qué pesa más: un kilo de plomo o un kilo de plumas?', options: ['El plomo', 'Las plumas', 'Pesan igual', 'Depende'], correct: 2, explanation: 'Un kilo pesa un kilo, sea de lo que sea.' },
-        { category: 'Lógico', text: 'Si todos los perros ladran y Toby ladra, ¿es Toby necesariamente un perro?', options: ['Sí, seguro', 'No necesariamente', 'Nunca', 'Imposible'], correct: 1, explanation: 'Que ladre no implica que sea perro: otros animales también pueden ladrar.' }
+        { category: 'Lógico', text: 'Si todos los perros ladran y Toby ladra, ¿es Toby necesariamente un perro?', options: ['Sí, seguro', 'No necesariamente', 'Nunca', 'Imposible'], correct: 1, explanation: 'Que ladre no implica que sea perro: otros animales también pueden ladrar.', difficulty: 2 },
+        { category: 'Lógico', text: 'María mira una foto y dice: «No tengo hermanos ni hermanas, pero el padre de este hombre es el hijo de mi padre». ¿Quién aparece en la foto?', options: ['Su padre', 'Su hijo', 'Su hermano', 'Ella misma'], correct: 1, explanation: '«El hijo de mi padre» es ella misma (no tiene hermanos): el padre del hombre es María, así que es su hijo.', difficulty: 3 },
+        { category: 'Lógico', text: 'Dos padres y dos hijos pescan 3 peces y cada uno pesca exactamente uno. ¿Cómo es posible?', options: ['Uno pescó dos', 'Son abuelo, padre e hijo', 'Sobró un pez', 'Es imposible'], correct: 1, explanation: 'Son tres personas: el abuelo (padre), el padre (padre e hijo a la vez) y el hijo.', difficulty: 3 },
+        { category: 'Lógico', text: 'Si algunos médicos son escritores y todos los escritores son creativos, ¿qué es seguro?', options: ['Todos los médicos son creativos', 'Algunos médicos son creativos', 'Ningún médico es creativo', 'Todos los creativos son médicos'], correct: 1, explanation: 'Los médicos que son escritores también son creativos: algunos médicos son creativos.', difficulty: 2 },
+        { category: 'Lógico', text: 'Un tren eléctrico avanza hacia el norte a 100 km/h. ¿Hacia dónde va el humo?', options: ['Al sur', 'Al norte', 'Depende del viento', 'No hay humo'], correct: 3, explanation: 'Un tren eléctrico no echa humo.', difficulty: 2 },
+        { category: 'Lógico', text: '¿Cuántas veces puedes restar 5 del número 25?', options: ['5 veces', '4 veces', 'Una vez', 'Infinitas'], correct: 2, explanation: 'Solo una: tras restar, el número ya no es 25 sino 20.', difficulty: 2 },
+        { category: 'Lógico', text: 'Laura tiene 4 hermanas y cada una de ellas tiene un hermano. ¿Cuántos chicos hay entre los hermanos?', options: ['4', '2', '1', '0'], correct: 2, explanation: 'Todas comparten el mismo hermano: hay 1 chico.', difficulty: 2 },
+        { category: 'Lógico', text: '¿Cuál de estos números se lee igual al derecho y al revés?', options: ['121', '123', '132', '213'], correct: 0, explanation: '121 es capicúa: se lee igual en ambos sentidos.' },
+        { category: 'Lógico', text: 'Pedro es más rápido que Juan, Juan más rápido que Luis y Luis más rápido que Marta. ¿Quién es el segundo más lento?', options: ['Juan', 'Luis', 'Marta', 'Pedro'], correct: 1, explanation: 'De lento a rápido: Marta, Luis, Juan, Pedro. El segundo más lento es Luis.', difficulty: 2 }
       ]
     },
 
@@ -373,13 +418,14 @@
       pick: 15,
       scoring: 'percent',
       scoreLabel: 'Cultura general',
+      mix: { 1: 10, 2: 5 },
       pool: [
         { category: 'Geografía', text: '¿Cuál es la capital de Francia?', options: ['Madrid', 'París', 'Roma', 'Berlín'], correct: 1, explanation: 'La capital de Francia es París.' },
         { category: 'Ciencia', text: '¿Cuántos planetas tiene el sistema solar?', options: ['7', '8', '9', '10'], correct: 1, explanation: 'Desde 2006 son 8 (Plutón pasó a planeta enano).' },
         { category: 'Arte', text: '¿Quién pintó la Mona Lisa?', options: ['Picasso', 'Van Gogh', 'Leonardo da Vinci', 'Miguel Ángel'], correct: 2, explanation: 'La pintó Leonardo da Vinci.' },
         { category: 'Geografía', text: '¿Cuál es el océano más grande?', options: ['Atlántico', 'Índico', 'Pacífico', 'Ártico'], correct: 2, explanation: 'El océano Pacífico es el más extenso.' },
         { category: 'Geografía', text: '¿En qué continente está Egipto?', options: ['Asia', 'África', 'Europa', 'Oceanía'], correct: 1, explanation: 'Egipto está en el noreste de África.' },
-        { category: 'Ciencia', text: '¿Qué metal es líquido a temperatura ambiente?', options: ['Hierro', 'Mercurio', 'Oro', 'Plomo'], correct: 1, explanation: 'El mercurio es líquido a temperatura ambiente.' },
+        { category: 'Ciencia', text: '¿Qué metal es líquido a temperatura ambiente?', options: ['Hierro', 'Mercurio', 'Oro', 'Plomo'], correct: 1, explanation: 'El mercurio es líquido a temperatura ambiente.', difficulty: 2 },
         { category: 'Ciencia', text: '¿Cuántos lados tiene un hexágono?', options: ['5', '6', '7', '8'], correct: 1, explanation: 'Un hexágono tiene 6 lados.' },
         { category: 'Arte', text: '¿Quién escribió "Don Quijote de la Mancha"?', options: ['Lope de Vega', 'Cervantes', 'Quevedo', 'Góngora'], correct: 1, explanation: 'Lo escribió Miguel de Cervantes.' },
         { category: 'Ciencia', text: '¿Cuál es el planeta más cercano al Sol?', options: ['Mercurio', 'Venus', 'Tierra', 'Marte'], correct: 0, explanation: 'Mercurio es el planeta más próximo al Sol.' },
@@ -387,15 +433,21 @@
         { category: 'Geografía', text: '¿En qué país está la Torre Eiffel?', options: ['Italia', 'Francia', 'España', 'Reino Unido'], correct: 1, explanation: 'La Torre Eiffel está en París, Francia.' },
         { category: 'Ciencia', text: '¿Quién desarrolló la teoría de la relatividad?', options: ['Newton', 'Einstein', 'Galileo', 'Darwin'], correct: 1, explanation: 'Albert Einstein desarrolló la teoría de la relatividad.' },
         { category: 'Ciencia', text: '¿Cuál es el animal terrestre más grande?', options: ['Elefante', 'Rinoceronte', 'Jirafa', 'Hipopótamo'], correct: 0, explanation: 'El elefante africano es el mayor animal terrestre.' },
-        { category: 'Historia', text: '¿En qué año llegó el ser humano a la Luna?', options: ['1959', '1969', '1979', '1985'], correct: 1, explanation: 'El Apolo 11 alunizó en 1969.' },
-        { category: 'Ciencia', text: '¿Cuál es el hueso más largo del cuerpo humano?', options: ['Fémur', 'Tibia', 'Húmero', 'Radio'], correct: 0, explanation: 'El fémur, en el muslo, es el hueso más largo.' },
+        { category: 'Historia', text: '¿En qué año llegó el ser humano a la Luna?', options: ['1959', '1969', '1979', '1985'], correct: 1, explanation: 'El Apolo 11 alunizó en 1969.', difficulty: 2 },
+        { category: 'Ciencia', text: '¿Cuál es el hueso más largo del cuerpo humano?', options: ['Fémur', 'Tibia', 'Húmero', 'Radio'], correct: 0, explanation: 'El fémur, en el muslo, es el hueso más largo.', difficulty: 2 },
         { category: 'Arte', text: '¿Qué instrumento tiene 88 teclas?', options: ['Guitarra', 'Piano', 'Violín', 'Arpa'], correct: 1, explanation: 'El piano estándar tiene 88 teclas.' },
         { category: 'Geografía', text: '¿Cuál es la capital de Japón?', options: ['Pekín', 'Seúl', 'Tokio', 'Bangkok'], correct: 2, explanation: 'La capital de Japón es Tokio.' },
         { category: 'Ciencia', text: '¿Cuántas patas tiene una araña?', options: ['6', '8', '10', '12'], correct: 1, explanation: 'Las arañas tienen 8 patas.' },
         { category: 'Ciencia', text: '¿Qué órgano bombea la sangre?', options: ['Pulmón', 'Corazón', 'Hígado', 'Riñón'], correct: 1, explanation: 'El corazón bombea la sangre por el cuerpo.' },
         { category: 'Geografía', text: '¿Cuál es la moneda de Japón?', options: ['Yuan', 'Yen', 'Won', 'Rupia'], correct: 1, explanation: 'La moneda de Japón es el yen.' },
-        { category: 'Historia', text: '¿Quién fue el primer presidente de Estados Unidos?', options: ['Lincoln', 'Washington', 'Jefferson', 'Roosevelt'], correct: 1, explanation: 'George Washington fue el primer presidente de EE. UU.' },
-        { category: 'Ciencia', text: '¿Cuál es el símbolo químico del agua?', options: ['O2', 'CO2', 'H2O', 'NaCl'], correct: 2, explanation: 'El agua es H₂O: dos hidrógenos y un oxígeno.' }
+        { category: 'Historia', text: '¿Quién fue el primer presidente de Estados Unidos?', options: ['Lincoln', 'Washington', 'Jefferson', 'Roosevelt'], correct: 1, explanation: 'George Washington fue el primer presidente de EE. UU.', difficulty: 2 },
+        { category: 'Ciencia', text: '¿Cuál es el símbolo químico del agua?', options: ['O2', 'CO2', 'H2O', 'NaCl'], correct: 2, explanation: 'El agua es H₂O: dos hidrógenos y un oxígeno.' },
+        { category: 'Ciencia', text: '¿Qué científica ganó dos premios Nobel?', options: ['Rosalind Franklin', 'Marie Curie', 'Ada Lovelace', 'Jane Goodall'], correct: 1, explanation: 'Marie Curie ganó el Nobel de Física (1903) y el de Química (1911).', difficulty: 2 },
+        { category: 'Geografía', text: '¿Cuál es el país más poblado del mundo?', options: ['China', 'India', 'Estados Unidos', 'Indonesia'], correct: 1, explanation: 'India superó a China en población en 2023.', difficulty: 2 },
+        { category: 'Historia', text: '¿En qué año terminó la Segunda Guerra Mundial?', options: ['1939', '1942', '1945', '1950'], correct: 2, explanation: 'La Segunda Guerra Mundial terminó en 1945.', difficulty: 2 },
+        { category: 'Geografía', text: '¿Cuál es la capital de Australia?', options: ['Sídney', 'Melbourne', 'Canberra', 'Perth'], correct: 2, explanation: 'La capital es Canberra, aunque Sídney sea la ciudad más famosa.', difficulty: 2 },
+        { category: 'Ciencia', text: '¿Cuál es el gas más abundante en la atmósfera terrestre?', options: ['Oxígeno', 'Nitrógeno', 'CO2', 'Hidrógeno'], correct: 1, explanation: 'El nitrógeno supone alrededor del 78% de la atmósfera.', difficulty: 2 },
+        { category: 'Arte', text: '¿Quién pintó «La noche estrellada»?', options: ['Monet', 'Van Gogh', 'Dalí', 'Goya'], correct: 1, explanation: 'La pintó Vincent van Gogh en 1889.', difficulty: 2 }
       ]
     },
 

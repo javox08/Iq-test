@@ -20,6 +20,9 @@
   // Estado del test en curso.
   let run = null;
 
+  // Siguiente test sugerido en la pantalla de resultados.
+  let nextTestId = null;
+
   /* ---------------- utilidades ---------------- */
 
   function showScreen(name) {
@@ -89,6 +92,38 @@
   // definen: se hacen a tu ritmo, sin cuenta atrás.
   function isTimed(t) {
     return typeof t.timeLimit === 'number';
+  }
+
+  // Selección de preguntas del intento.
+  // - Quiz con `mix`: muestreo estratificado por dificultad (misma proporción de
+  //   fáciles/difíciles en cada intento, como en un test real).
+  // - Escalas multidimensión: muestreo equilibrado por dimensión (mismo número de
+  //   ítems por rasgo en cada intento, para que el perfil sea comparable y fiable).
+  function selectQuestions(t) {
+    if (t.mix) {
+      let picked = [];
+      Object.keys(t.mix).forEach((d) => {
+        const tier = shuffle(t.pool.filter((q) => (q.difficulty || 1) === Number(d)));
+        picked = picked.concat(tier.slice(0, t.mix[d]));
+      });
+      return shuffle(picked);
+    }
+    if (t.type === 'scale') {
+      const dims = Object.keys(t.dimensions || {});
+      if (dims.length > 1) {
+        const per = Math.floor(t.pick / dims.length);
+        let picked = [];
+        let rest = [];
+        dims.forEach((d) => {
+          const items = shuffle(t.pool.filter((q) => q.dim === d));
+          picked = picked.concat(items.slice(0, per));
+          rest = rest.concat(items.slice(per));
+        });
+        picked = picked.concat(shuffle(rest).slice(0, Math.max(0, t.pick - picked.length)));
+        return shuffle(picked);
+      }
+    }
+    return shuffle(t.pool).slice(0, Math.min(t.pick, t.pool.length));
   }
 
   /* ---------------- PORTADA / HUB ---------------- */
@@ -184,8 +219,8 @@
     const t = TESTS[run.testId];
     session.playerName = $('player-name').value.trim();
 
-    // Barajar el banco y elegir las preguntas de este intento.
-    let questions = shuffle(t.pool).slice(0, Math.min(t.pick, t.pool.length));
+    // Elegir las preguntas de este intento.
+    let questions = selectQuestions(t);
 
     // En los quiz, barajamos también las opciones y recalculamos la correcta.
     if (t.type === 'quiz') {
@@ -197,7 +232,8 @@
           text: q.text,
           options: shuffled.map((o) => o.text),
           correct: shuffled.findIndex((o) => o.correct),
-          explanation: q.explanation || ''
+          explanation: q.explanation || '',
+          difficulty: q.difficulty || 1
         };
       });
     }
@@ -321,6 +357,16 @@
       (acc, ans, i) => acc + (ans === questions[i].correct ? 1 : 0), 0);
     const percent = correctCount / questions.length;
 
+    // Puntuación ponderada por dificultad: acertar preguntas difíciles vale más
+    // (como en los tests reales basados en teoría de respuesta al ítem).
+    let earnedW = 0, possibleW = 0;
+    questions.forEach((q, i) => {
+      const w = q.difficulty || 1;
+      possibleW += w;
+      if (answers[i] === q.correct) earnedW += w;
+    });
+    const ability = possibleW ? earnedW / possibleW : 0; // 0..1 ponderado
+
     // Desglose por categoría.
     const cats = {};
     questions.forEach((q, i) => {
@@ -339,10 +385,10 @@
 
     let headline, headlineLabel, tier, message, speedInfo;
     if (t.scoring === 'iq') {
-      // Acierto -> 40..145 (componente "potencia"); velocidad -> hasta +15 (bonus).
+      // Acierto ponderado -> 40..145 (componente "potencia"); velocidad -> +15.
       // Rango 40-160 = escala Wechsler (media 100, desviación 15).
-      const baseIQ = 40 + percent * 105;
-      const bonus = SPEED.iqBonusMax * speed * percent;
+      const baseIQ = 40 + ability * 105;
+      const bonus = SPEED.iqBonusMax * speed * ability;
       const bonusPts = Math.round(bonus);
       let iq = Math.round(baseIQ + bonus);
       iq = Math.max(40, Math.min(160, iq));
@@ -357,9 +403,9 @@
     } else {
       // Quiz cronometrado (atención, numérico, lógico, cultura):
       // base 0..85 por acierto + hasta +15 por velocidad.
-      const bonus = SPEED.concentrationBonusMax * speed * percent;
+      const bonus = SPEED.concentrationBonusMax * speed * ability;
       const bonusPts = Math.round(bonus);
-      const pts = Math.max(0, Math.min(100, Math.round(percent * 85 + bonus)));
+      const pts = Math.max(0, Math.min(100, Math.round(ability * 85 + bonus)));
       headline = String(pts);
       headlineLabel = t.scoreLabel || 'Puntuación';
       if (pts >= 85) tier = { label: 'Excelente', level: 'high' };
@@ -553,6 +599,17 @@
     } else {
       reviewBtn.classList.add('hidden');
     }
+
+    // Sugerir el siguiente test pendiente para encadenar la batería.
+    nextTestId = TEST_ORDER.find((id) => !session.results[id]) || null;
+    const nextBtn = $('btn-next-test');
+    if (nextTestId) {
+      const nt = TESTS[nextTestId];
+      nextBtn.textContent = `Siguiente test: ${nt.icon} ${nt.title} →`;
+    } else {
+      nextBtn.textContent = '🎉 ¡Batería completa! Ver tu informe';
+    }
+    $('next-test-wrap').classList.remove('hidden');
   }
 
   $('btn-review').addEventListener('click', () => {
@@ -706,6 +763,16 @@
 
   /* ---------------- EVENTOS ---------------- */
 
+  $('btn-hero-start').addEventListener('click', () => openIntro('iq'));
+  $('btn-next-test').addEventListener('click', () => {
+    if (nextTestId) {
+      openIntro(nextTestId);
+    } else {
+      showScreen('hub');
+      renderHub();
+      openReport();
+    }
+  });
   $('btn-intro-back').addEventListener('click', () => { showScreen('hub'); renderHub(); });
   $('btn-start').addEventListener('click', startRun);
   $('btn-retry').addEventListener('click', () => openIntro(run.testId));

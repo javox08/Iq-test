@@ -133,5 +133,13 @@ vacío, output `/`. En ese modo la carpeta `functions/` se enruta sola y `worker
   - Ajusta los pesos en la constante `SPEED` de `script.js`.
 - **Explicaciones**: en los tests tipo quiz, al ver las respuestas se muestra el porqué de
   cada fallo (campo `explanation` de cada pregunta en `data.js`).
-- **Banco ampliado**: el CI tiene 52 preguntas y muestra 25 (12 min) para reducir repeticiones
-  y discriminar mejor los CI altos.
+- **Precisión tipo test real**:
+  - Todos los quizzes etiquetan cada pregunta con `difficulty` (1–3) y definen un `mix`:
+    cada intento sirve la **misma proporción de fáciles/difíciles** (muestreo estratificado),
+    y **acertar preguntas difíciles puntúa más** (puntuación ponderada por dificultad).
+  - Las escalas multidimensión usan **muestreo equilibrado por dimensión** (mismo número de
+    ítems por rasgo en cada intento), para que los perfiles sean comparables y fiables.
+- **Banco ampliado**: el CI tiene 68 preguntas y muestra 25 (12 min); el resto de quizzes
+  también tienen bancos mayores que su `pick` para que roten.
+- **Optimizado para conversión**: CTA directo al test de CI en la portada, botón de
+  "siguiente test" al terminar (encadena la batería) y metadatos Open Graph para compartir.
