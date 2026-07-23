@@ -139,7 +139,13 @@ vacío, output `/`. En ese modo la carpeta `functions/` se enruta sola y `worker
     y **acertar preguntas difíciles puntúa más** (puntuación ponderada por dificultad).
   - Las escalas multidimensión usan **muestreo equilibrado por dimensión** (mismo número de
     ítems por rasgo en cada intento), para que los perfiles sean comparables y fiables.
-- **Banco ampliado**: el CI tiene 68 preguntas y muestra 25 (12 min); el resto de quizzes
-  también tienen bancos mayores que su `pick` para que roten.
+- **Banco ampliado**: el CI tiene 86 preguntas y muestra 25 (12 min); el resto de quizzes
+  también tienen bancos mayores que su `pick` para que roten en cada intento.
 - **Optimizado para conversión**: CTA directo al test de CI en la portada, botón de
   "siguiente test" al terminar (encadena la batería) y metadatos Open Graph para compartir.
+- **Diseño responsive (móvil, tablet y PC)**: la portada usa varias columnas en pantallas
+  anchas (1 en móvil, 2 en tablet, hasta 4 en PC) mientras las pantallas de test se mantienen
+  centradas y legibles.
+- **Sin caché obsoleta**: `worker.js` sirve los archivos con `Cache-Control: no-cache`, así
+  que tras un despliegue el navegador siempre carga la versión nueva (antes podían "salir
+  siempre las mismas preguntas" por servir JS antiguo desde caché).

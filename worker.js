@@ -17,6 +17,13 @@ export default {
     }
 
     // Todo lo demás: HTML, CSS, JS, etc. desde los activos estáticos.
-    return env.ASSETS.fetch(request);
+    const res = await env.ASSETS.fetch(request);
+
+    // Forzar revalidación: evita que el navegador sirva JS/HTML antiguos tras un
+    // despliegue (por eso "salían siempre las mismas preguntas"). Con no-cache el
+    // navegador comprueba el ETag y descarga la versión nueva si ha cambiado.
+    const headers = new Headers(res.headers);
+    headers.set('Cache-Control', 'no-cache');
+    return new Response(res.body, { status: res.status, statusText: res.statusText, headers });
   }
 };

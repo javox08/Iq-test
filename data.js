@@ -45,7 +45,7 @@
       // Muestreo estratificado por dificultad (1 fácil/media, 2 media-alta, 3 difícil):
       // cada intento saca la misma mezcla, como en un test real. La dificultad también
       // pondera la puntuación (acertar preguntas difíciles vale más).
-      mix: { 1: 15, 2: 3, 3: 7 },
+      mix: { 1: 14, 2: 5, 3: 6 },
       pool: [
         // ---- LÓGICA ----
         { category: 'Lógica', text: 'Completa la secuencia: 2, 4, 8, 16, ?', options: ['24', '30', '32', '20'], correct: 2, explanation: 'Cada número se multiplica por 2, así que sigue el 32.' },
@@ -125,7 +125,31 @@
         { category: 'Lógica', text: 'En una reunión de 5 personas, cada una saluda a las demás con un apretón de manos. ¿Cuántos apretones hay en total?', options: ['10', '20', '15', '25'], correct: 0, explanation: 'Son las combinaciones de 5 en 2: 5 × 4 ÷ 2 = 10.', difficulty: 3 },
         { category: 'Patrones', text: 'Serie: 0, 1, 1, 2, 4, 7, 13, ?', options: ['20', '22', '24', '26'], correct: 2, explanation: 'Cada término es la suma de los tres anteriores: 4 + 7 + 13 = 24.', difficulty: 3 },
         { category: 'Matemáticas', text: 'Si el 15% de un número es 30, ¿cuánto es el 40% de ese número?', options: ['60', '75', '80', '90'], correct: 2, explanation: '15% = 30 → el número es 200; el 40% de 200 es 80.', difficulty: 3 },
-        { category: 'Patrones', text: 'Serie: 2, 5, 11, 23, 47, ?', options: ['93', '95', '94', '96'], correct: 1, explanation: 'Cada término es el doble del anterior más 1: 47 × 2 + 1 = 95.', difficulty: 3 }
+        { category: 'Patrones', text: 'Serie: 2, 5, 11, 23, 47, ?', options: ['93', '95', '94', '96'], correct: 1, explanation: 'Cada término es el doble del anterior más 1: 47 × 2 + 1 = 95.', difficulty: 3 },
+
+        // ---- MÁS PREGUNTAS: fáciles (1) ----
+        { category: 'Lógica', text: '¿Qué número falta? 10, 20, 30, ?, 50', options: ['35', '40', '45', '38'], correct: 1, explanation: 'Van de 10 en 10: falta el 40.' },
+        { category: 'Matemáticas', text: '¿Cuánto es 100 − 45?', options: ['45', '55', '65', '50'], correct: 1, explanation: '100 − 45 = 55.' },
+        { category: 'Patrones', text: 'Completa: 5, 10, 15, 20, ?', options: ['22', '25', '30', '24'], correct: 1, explanation: 'Van de 5 en 5: sigue el 25.' },
+        { category: 'Verbal', text: 'Día es a Noche como Blanco es a...', options: ['Gris', 'Negro', 'Claro', 'Luz'], correct: 1, explanation: 'Día y noche son opuestos, como blanco y negro.' },
+        { category: 'Verbal', text: '¿Cuál es el sinónimo de "contento"?', options: ['Triste', 'Feliz', 'Enfadado', 'Cansado'], correct: 1, explanation: 'Contento significa feliz.' },
+        { category: 'Matemáticas', text: '¿Cuánto es 8 + 7?', options: ['14', '15', '16', '13'], correct: 1, explanation: '8 + 7 = 15.' },
+
+        // ---- MÁS PREGUNTAS: dificultad media (2) ----
+        { category: 'Lógica', text: 'Si un libro cuesta 12 € y pago con 20 €, ¿cuánto me devuelven?', options: ['6 €', '7 €', '8 €', '9 €'], correct: 2, explanation: '20 − 12 = 8 €.', difficulty: 2 },
+        { category: 'Patrones', text: 'Serie: 1, 4, 9, 16, ?, 36', options: ['20', '25', '30', '24'], correct: 1, explanation: 'Son cuadrados: el que falta es 5² = 25.', difficulty: 2 },
+        { category: 'Verbal', text: '¿Cuál es el antónimo de "valiente"?', options: ['Audaz', 'Cobarde', 'Fuerte', 'Héroe'], correct: 1, explanation: 'Lo contrario de valiente es cobarde.', difficulty: 2 },
+        { category: 'Matemáticas', text: 'Un pastel se corta en 8 partes iguales y comes 3. ¿Qué fracción queda?', options: ['3/8', '5/8', '1/2', '3/5'], correct: 1, explanation: 'Quedan 8 − 3 = 5 partes: 5/8.', difficulty: 2 },
+        { category: 'Patrones', text: 'Serie: 2, 4, 8, 14, 22, ?', options: ['30', '32', '34', '28'], correct: 1, explanation: 'Las diferencias crecen +2, +4, +6, +8, +10: 22 + 10 = 32.', difficulty: 2 },
+        { category: 'Lógica', text: 'Todos los cuadrados son rectángulos. ¿Son todos los rectángulos cuadrados?', options: ['Sí', 'No', 'A veces', 'No se sabe'], correct: 1, explanation: 'Un rectángulo no siempre tiene los cuatro lados iguales, así que no.', difficulty: 2 },
+        { category: 'Verbal', text: 'Sol es a Día como Luna es a...', options: ['Estrella', 'Noche', 'Cielo', 'Oscuridad'], correct: 1, explanation: 'El sol se asocia al día y la luna a la noche.', difficulty: 2 },
+
+        // ---- MÁS PREGUNTAS: dificultad alta (3) ----
+        { category: 'Matemáticas', text: '¿Cuánto es el 12,5% de 800?', options: ['80', '100', '120', '125'], correct: 1, explanation: '12,5% es 1/8; 800 ÷ 8 = 100.', difficulty: 3 },
+        { category: 'Lógica', text: 'En una habitación hay 4 esquinas, en cada esquina un gato y frente a cada gato hay 3 gatos. ¿Cuántos gatos hay en total?', options: ['4', '12', '16', '8'], correct: 0, explanation: 'Solo 4: cada gato tiene enfrente a los otros tres.', difficulty: 3 },
+        { category: 'Matemáticas', text: 'Tengo 8 años y mi hermano tiene el doble. ¿Cuántos años tendrá mi hermano cuando yo tenga 20?', options: ['24', '28', '32', '16'], correct: 1, explanation: 'Mi hermano tiene 8 años más que yo (16 − 8); cuando yo tenga 20, él tendrá 28.', difficulty: 3 },
+        { category: 'Patrones', text: 'Serie: 1, 2, 3, 5, 8, 13, 21, ?', options: ['30', '32', '34', '35'], correct: 2, explanation: 'Cada término es la suma de los dos anteriores (Fibonacci): 13 + 21 = 34.', difficulty: 3 },
+        { category: 'Matemáticas', text: 'Si 6 gatos cazan 6 ratones en 6 minutos, ¿cuántos gatos hacen falta para cazar 60 ratones en 60 minutos?', options: ['6', '10', '60', '36'], correct: 0, explanation: 'Cada gato caza 1 ratón cada 6 min, o sea 10 en 60 min; con 6 gatos se cazan 60 ratones en 60 minutos.', difficulty: 3 }
       ]
     },
 
@@ -363,7 +387,12 @@
         { category: 'Numérico', text: 'Serie: 3, 7, 15, 31, ?', options: ['47', '55', '63', '62'], correct: 2, explanation: 'Cada término es el doble del anterior más 1: 31 × 2 + 1 = 63.', difficulty: 2 },
         { category: 'Numérico', text: '¿Cuánto es el 20% de 150?', options: ['25', '30', '35', '40'], correct: 1, explanation: '150 ÷ 5 = 30.' },
         { category: 'Numérico', text: 'Serie: 64, 32, 16, 8, ?', options: ['2', '4', '6', '8'], correct: 1, explanation: 'Se divide entre 2: 8 ÷ 2 = 4.' },
-        { category: 'Numérico', text: 'Si compro 3 cafés a 1,20 € cada uno, ¿cuánto pago?', options: ['3 €', '3,40 €', '3,60 €', '4 €'], correct: 2, explanation: '1,20 × 3 = 3,60 €.' }
+        { category: 'Numérico', text: 'Si compro 3 cafés a 1,20 € cada uno, ¿cuánto pago?', options: ['3 €', '3,40 €', '3,60 €', '4 €'], correct: 2, explanation: '1,20 × 3 = 3,60 €.' },
+        { category: 'Numérico', text: '¿Cuánto es 9 × 6?', options: ['54', '56', '63', '48'], correct: 0, explanation: '9 × 6 = 54.' },
+        { category: 'Numérico', text: 'Serie: 5, 8, 11, 14, ?', options: ['16', '17', '18', '15'], correct: 1, explanation: 'Van de 3 en 3: 14 + 3 = 17.' },
+        { category: 'Numérico', text: '¿Cuánto es la raíz cuadrada de 81?', options: ['7', '8', '9', '11'], correct: 2, explanation: '9 × 9 = 81, así que √81 = 9.', difficulty: 2 },
+        { category: 'Numérico', text: 'Si tardo 15 minutos en cada ejercicio, ¿cuántos hago en 1 hora?', options: ['3', '4', '5', '6'], correct: 1, explanation: '60 ÷ 15 = 4 ejercicios.', difficulty: 2 },
+        { category: 'Numérico', text: '¿Cuánto es 7 × 8 − 6?', options: ['48', '50', '52', '56'], correct: 1, explanation: '7 × 8 = 56; 56 − 6 = 50.', difficulty: 2 }
       ]
     },
 
@@ -447,7 +476,13 @@
         { category: 'Historia', text: '¿En qué año terminó la Segunda Guerra Mundial?', options: ['1939', '1942', '1945', '1950'], correct: 2, explanation: 'La Segunda Guerra Mundial terminó en 1945.', difficulty: 2 },
         { category: 'Geografía', text: '¿Cuál es la capital de Australia?', options: ['Sídney', 'Melbourne', 'Canberra', 'Perth'], correct: 2, explanation: 'La capital es Canberra, aunque Sídney sea la ciudad más famosa.', difficulty: 2 },
         { category: 'Ciencia', text: '¿Cuál es el gas más abundante en la atmósfera terrestre?', options: ['Oxígeno', 'Nitrógeno', 'CO2', 'Hidrógeno'], correct: 1, explanation: 'El nitrógeno supone alrededor del 78% de la atmósfera.', difficulty: 2 },
-        { category: 'Arte', text: '¿Quién pintó «La noche estrellada»?', options: ['Monet', 'Van Gogh', 'Dalí', 'Goya'], correct: 1, explanation: 'La pintó Vincent van Gogh en 1889.', difficulty: 2 }
+        { category: 'Arte', text: '¿Quién pintó «La noche estrellada»?', options: ['Monet', 'Van Gogh', 'Dalí', 'Goya'], correct: 1, explanation: 'La pintó Vincent van Gogh en 1889.', difficulty: 2 },
+        { category: 'Geografía', text: '¿Cuál es el río más largo del mundo?', options: ['Nilo', 'Amazonas', 'Misisipi', 'Yangtsé'], correct: 1, explanation: 'Estudios recientes sitúan al Amazonas como el más largo (unos 7000 km).', difficulty: 2 },
+        { category: 'Ciencia', text: '¿A qué velocidad viaja la luz (aprox.)?', options: ['300 km/s', '3000 km/s', '300 000 km/s', '30 000 km/s'], correct: 2, explanation: 'La luz viaja a unos 300 000 km por segundo.', difficulty: 2 },
+        { category: 'Historia', text: '¿Qué civilización construyó las pirámides de Guiza?', options: ['Los romanos', 'Los egipcios', 'Los griegos', 'Los mayas'], correct: 1, explanation: 'Las construyeron los antiguos egipcios.' },
+        { category: 'Geografía', text: '¿Cuál es el desierto más grande del mundo?', options: ['Sáhara', 'Gobi', 'Antártico', 'Atacama'], correct: 2, explanation: 'El desierto más grande es el Antártico (un desierto polar).', difficulty: 2 },
+        { category: 'Ciencia', text: '¿Cuál es el elemento químico más abundante del universo?', options: ['Oxígeno', 'Hidrógeno', 'Carbono', 'Helio'], correct: 1, explanation: 'El hidrógeno es el elemento más abundante del universo.', difficulty: 2 },
+        { category: 'Arte', text: '¿Cuántas cuerdas tiene una guitarra española clásica?', options: ['4', '5', '6', '7'], correct: 2, explanation: 'La guitarra clásica tiene 6 cuerdas.' }
       ]
     },
 

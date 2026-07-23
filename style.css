@@ -506,8 +506,8 @@ h1 {
 
 .test-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 14px;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 16px;
   margin: 22px 0;
 }
 
@@ -725,14 +725,64 @@ h1 {
   padding: 18px;
 }
 
-@media (max-width: 560px) {
-  .test-grid { grid-template-columns: 1fr; }
-}
-
+/* ---- MÓVIL ---- */
 @media (max-width: 480px) {
   .card { padding: 24px 18px; }
   .iq-score { font-size: 2.8rem; }
   h1 { font-size: 1.4rem; }
   .quiz-nav { flex-wrap: wrap; }
   .result-actions { flex-wrap: wrap; }
+}
+
+/* ---- TABLET (dos+ columnas, más aire) ---- */
+@media (min-width: 700px) {
+  .app { max-width: 900px; padding: 34px 28px 72px; }
+  h1 { font-size: 2rem; }
+  .hub-header { margin-bottom: 18px; }
+  .brain-icon { font-size: 56px; }
+  .subtitle { font-size: 1.05rem; }
+
+  /* Pantallas de test/resultado centradas y a ancho de lectura cómodo. */
+  #screen-intro .card,
+  #screen-result .card,
+  #screen-quiz .quiz-header,
+  #screen-quiz .quiz-card,
+  #screen-quiz .quiz-nav {
+    max-width: 680px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .q-text { font-size: 1.4rem; }
+  .option { padding: 16px 18px; font-size: 1.02rem; }
+}
+
+/* ---- PC / ESCRITORIO (portada ancha, más columnas) ---- */
+@media (min-width: 1024px) {
+  .app { max-width: 1140px; padding: 44px 32px 90px; }
+  .hub-header { margin-bottom: 26px; }
+  h1 { font-size: 2.3rem; }
+  .brain-icon { font-size: 64px; }
+  .test-card { padding: 22px; }
+  .test-card:hover { transform: translateY(-4px); }
+  .test-card-icon { font-size: 40px; }
+  .test-card-title { font-size: 1.15rem; }
+  .hero-cta { font-size: 1.05rem; padding: 16px 22px; }
+
+  /* La portada usa todo el ancho; el resto de pantallas se mantienen legibles. */
+  #screen-intro .card,
+  #screen-result .card { max-width: 720px; }
+  #screen-quiz .quiz-header,
+  #screen-quiz .quiz-card,
+  #screen-quiz .quiz-nav { max-width: 760px; }
+}
+
+/* Pantallas muy anchas: no dejar que crezca sin control. */
+@media (min-width: 1500px) {
+  .app { max-width: 1280px; }
+}
+
+/* Puntero fino (ratón): realzar interacción. */
+@media (hover: hover) and (pointer: fine) {
+  .option:hover { background: rgba(124, 92, 255, 0.1); }
+  .btn:hover { transform: translateY(-1px); }
 }
