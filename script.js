@@ -23,6 +23,26 @@
   // Siguiente test sugerido en la pantalla de resultados.
   let nextTestId = null;
 
+  // Datos de compartir del resultado actual (texto + enlace).
+  let currentShare = { text: '', url: '' };
+
+  // Texto de compartir usando el resultado REAL de la persona.
+  function buildShareText(r) {
+    const t = TESTS[r.testId];
+    if (t.scoring === 'iq') {
+      return `${r.icon} He sacado ${r.headline} de CI (${r.tier.label}) en este test de inteligencia. ¿Me superas?`;
+    }
+    if (t.type === 'quiz') {
+      return `${r.icon} He sacado ${r.headline}/100 en "${r.title}". ¿Me superas?`;
+    }
+    // Escalas: rasgo dominante o nivel.
+    return `${r.icon} En el test de ${r.title.toLowerCase()}, mi resultado es: ${r.headline} (${r.headlineLabel.toLowerCase()}). ¿Y el tuyo?`;
+  }
+
+  function shareUrl() {
+    return location.origin + location.pathname;
+  }
+
   /* ---------------- utilidades ---------------- */
 
   function showScreen(name) {
@@ -600,6 +620,14 @@
       reviewBtn.classList.add('hidden');
     }
 
+    // Preparar el compartir con el resultado real de esta persona.
+    currentShare = { text: buildShareText(r), url: shareUrl() };
+    const full = `${currentShare.text} ${currentShare.url}`;
+    $('share-wa').href = `https://wa.me/?text=${encodeURIComponent(full)}`;
+    $('share-x').href = `https://twitter.com/intent/tweet?text=${encodeURIComponent(currentShare.text)}&url=${encodeURIComponent(currentShare.url)}`;
+    $('share-status').textContent = '';
+    $('share-status').className = 'share-status';
+
     // Sugerir el siguiente test pendiente para encadenar la batería.
     nextTestId = TEST_ORDER.find((id) => !session.results[id]) || null;
     const nextBtn = $('btn-next-test');
@@ -762,6 +790,33 @@
   }
 
   /* ---------------- EVENTOS ---------------- */
+
+  // Compartir: usa el menú nativo del móvil si existe; si no, copia al portapapeles.
+  function shareStatus(msg, ok) {
+    const el = $('share-status');
+    el.textContent = msg;
+    el.className = 'share-status ' + (ok ? 'ok' : 'error');
+  }
+  async function copyShare() {
+    const full = `${currentShare.text} ${currentShare.url}`;
+    try {
+      await navigator.clipboard.writeText(full);
+      shareStatus('✓ ¡Copiado! Ya puedes pegarlo donde quieras.', true);
+    } catch (_) {
+      shareStatus('Copia este texto: ' + full, false);
+    }
+  }
+  $('btn-share').addEventListener('click', async () => {
+    const full = `${currentShare.text} ${currentShare.url}`;
+    if (navigator.share) {
+      try {
+        await navigator.share({ text: currentShare.text, url: currentShare.url });
+      } catch (_) { /* el usuario canceló: no hacemos nada */ }
+    } else {
+      copyShare();
+    }
+  });
+  $('share-copy').addEventListener('click', copyShare);
 
   $('btn-hero-start').addEventListener('click', () => openIntro('iq'));
   $('btn-next-test').addEventListener('click', () => {

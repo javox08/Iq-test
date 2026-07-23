@@ -600,6 +600,53 @@ h1 {
   margin: 6px 0 4px;
 }
 
+/* ---- COMPARTIR RESULTADO ---- */
+.share-box {
+  margin: 16px 0 4px;
+  padding: 16px;
+  border-radius: 14px;
+  border: 1px solid rgba(34, 211, 238, 0.3);
+  background: radial-gradient(circle at 50% 0%, rgba(34, 211, 238, 0.12), rgba(124, 92, 255, 0.06));
+  text-align: center;
+}
+.share-title {
+  display: block;
+  font-weight: 700;
+  font-size: 0.95rem;
+  margin-bottom: 12px;
+}
+.btn-share {
+  background: linear-gradient(135deg, var(--accent-2), #38bdf8);
+  color: #04243a;
+  box-shadow: 0 8px 24px rgba(34, 211, 238, 0.3);
+}
+.share-links {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+}
+.share-link {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 10px 8px;
+  border-radius: 10px;
+  border: 1px solid var(--card-border);
+  background: var(--bg-2);
+  color: var(--text);
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition: border-color .15s, background .15s;
+}
+.share-link:hover { border-color: var(--accent-2); background: rgba(34, 211, 238, 0.08); }
+.share-status { font-size: 0.82rem; margin: 10px 0 0; min-height: 1em; }
+.share-status.ok { color: var(--success); }
+.share-status.error { color: var(--text-dim); word-break: break-word; }
+
 .speed-line {
   text-align: center;
   font-size: 0.85rem;
