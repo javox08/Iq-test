@@ -620,6 +620,12 @@ h1 {
   color: #04243a;
   box-shadow: 0 8px 24px rgba(34, 211, 238, 0.3);
 }
+.btn-share-img {
+  margin-top: 8px;
+  font-size: 0.9rem;
+  padding: 11px 16px;
+}
+
 .share-links {
   display: flex;
   gap: 8px;

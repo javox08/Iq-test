@@ -23,8 +23,83 @@
   // Siguiente test sugerido en la pantalla de resultados.
   let nextTestId = null;
 
-  // Datos de compartir del resultado actual (texto + enlace).
+  // Datos de compartir del resultado actual (texto + enlace) y el resultado en sí.
   let currentShare = { text: '', url: '' };
+  let currentResult = null;
+
+  /* ---------- Tarjeta-imagen del resultado (para redes) ---------- */
+
+  const EMOJI_FONT = '"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",serif';
+
+  function roundRectPath(ctx, x, y, w, h, r) {
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.arcTo(x + w, y, x + w, y + h, r);
+    ctx.arcTo(x + w, y + h, x, y + h, r);
+    ctx.arcTo(x, y + h, x, y, r);
+    ctx.arcTo(x, y, x + w, y, r);
+    ctx.closePath();
+  }
+
+  function drawShareCard(r) {
+    const W = 1080, H = 1080;
+    const c = document.createElement('canvas');
+    c.width = W; c.height = H;
+    const ctx = c.getContext('2d');
+
+    // Fondo degradado + resplandor.
+    const bg = ctx.createLinearGradient(0, 0, W, H);
+    bg.addColorStop(0, '#1b2036'); bg.addColorStop(1, '#0f1120');
+    ctx.fillStyle = bg; ctx.fillRect(0, 0, W, H);
+    const glow = ctx.createRadialGradient(W / 2, 330, 60, W / 2, 330, 780);
+    glow.addColorStop(0, 'rgba(124,92,255,0.35)');
+    glow.addColorStop(1, 'rgba(124,92,255,0)');
+    ctx.fillStyle = glow; ctx.fillRect(0, 0, W, H);
+
+    // Marco redondeado.
+    ctx.strokeStyle = 'rgba(124,92,255,0.45)'; ctx.lineWidth = 5;
+    roundRectPath(ctx, 36, 36, W - 72, H - 72, 44); ctx.stroke();
+
+    ctx.textAlign = 'center';
+
+    // Emoji del test.
+    ctx.font = `130px ${EMOJI_FONT}`;
+    ctx.fillText(r.icon, W / 2, 250);
+
+    // Título del test.
+    ctx.fillStyle = '#22d3ee'; ctx.font = '700 38px system-ui, sans-serif';
+    ctx.fillText(r.title.toUpperCase(), W / 2, 332);
+
+    // Etiqueta (ESTIMACIÓN DE CI, RASGO DOMINANTE, ...).
+    ctx.fillStyle = '#9aa0c3'; ctx.font = '500 34px system-ui, sans-serif';
+    ctx.fillText(r.headlineLabel.toUpperCase(), W / 2, 432);
+
+    // Titular grande (número o palabra), con gradiente y tamaño adaptativo.
+    const hl = String(r.headline);
+    const size = hl.length <= 4 ? 260 : hl.length <= 9 ? 140 : 96;
+    const grad = ctx.createLinearGradient(W / 2 - 320, 0, W / 2 + 320, 0);
+    grad.addColorStop(0, '#a78bfa'); grad.addColorStop(1, '#22d3ee');
+    ctx.fillStyle = grad; ctx.font = `800 ${size}px system-ui, sans-serif`;
+    ctx.fillText(hl, W / 2, hl.length <= 4 ? 660 : 600);
+
+    // Categoría / nivel.
+    ctx.fillStyle = '#34d399'; ctx.font = '700 46px system-ui, sans-serif';
+    ctx.fillText(r.tier.label, W / 2, 762);
+
+    // Reto + enlace.
+    ctx.fillStyle = '#eef0fb'; ctx.font = '700 54px system-ui, sans-serif';
+    ctx.fillText('¿Me superas?', W / 2, 902);
+    ctx.fillStyle = '#9aa0c3'; ctx.font = '500 34px system-ui, sans-serif';
+    ctx.fillText(location.host || 'test de CI', W / 2, 966);
+
+    return c;
+  }
+
+  function canvasBlob(canvas) {
+    return new Promise((resolve, reject) => {
+      canvas.toBlob((b) => (b ? resolve(b) : reject(new Error('toBlob'))), 'image/png');
+    });
+  }
 
   // Texto de compartir usando el resultado REAL de la persona.
   function buildShareText(r) {
@@ -621,6 +696,7 @@
     }
 
     // Preparar el compartir con el resultado real de esta persona.
+    currentResult = r;
     currentShare = { text: buildShareText(r), url: shareUrl() };
     const full = `${currentShare.text} ${currentShare.url}`;
     $('share-wa').href = `https://wa.me/?text=${encodeURIComponent(full)}`;
@@ -807,15 +883,45 @@
     }
   }
   $('btn-share').addEventListener('click', async () => {
-    const full = `${currentShare.text} ${currentShare.url}`;
+    if (!currentResult) return;
+    // 1) Compartir con la imagen adjunta (mejor en móvil).
+    let file = null;
+    try {
+      const blob = await canvasBlob(drawShareCard(currentResult));
+      file = new File([blob], 'mi-resultado.png', { type: 'image/png' });
+    } catch (_) { file = null; }
+
+    if (file && navigator.canShare && navigator.canShare({ files: [file] })) {
+      try { await navigator.share({ files: [file], text: currentShare.text, url: currentShare.url }); } catch (_) {}
+      return;
+    }
+    // 2) Compartir solo texto + enlace.
     if (navigator.share) {
-      try {
-        await navigator.share({ text: currentShare.text, url: currentShare.url });
-      } catch (_) { /* el usuario canceló: no hacemos nada */ }
-    } else {
-      copyShare();
+      try { await navigator.share({ text: currentShare.text, url: currentShare.url }); } catch (_) {}
+      return;
+    }
+    // 3) Copiar al portapapeles.
+    copyShare();
+  });
+
+  $('btn-share-img').addEventListener('click', async () => {
+    if (!currentResult) return;
+    try {
+      const blob = await canvasBlob(drawShareCard(currentResult));
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `mi-resultado-${currentResult.testId}.png`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(() => URL.revokeObjectURL(url), 1500);
+      shareStatus('✓ Imagen descargada. ¡Súbela a tus historias o publicaciones!', true);
+    } catch (_) {
+      shareStatus('No se pudo generar la imagen en este navegador.', false);
     }
   });
+
   $('share-copy').addEventListener('click', copyShare);
 
   $('btn-hero-start').addEventListener('click', () => openIntro('iq'));
