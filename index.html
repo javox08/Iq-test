@@ -16,15 +16,30 @@
 
 <div class="bg-decor" aria-hidden="true"></div>
 
+<!-- Barra de marca superior -->
+<div class="topbar">
+  <div class="topbar-inner">
+    <span class="brand"><span class="brand-mark">🧠</span> Mente<span class="brand-accent">Lab</span></span>
+    <span class="brand-tag">Tests cognitivos y de personalidad</span>
+  </div>
+</div>
+
 <main class="app">
 
   <!-- ============ PORTADA / HUB ============ -->
   <section id="screen-hub" class="screen active">
     <header class="hub-header">
-      <div class="brain-icon">🧠</div>
-      <h1>Batería de Tests Psicológicos</h1>
-      <p class="subtitle">14 tests gratis con resultado al momento. Cada intento baraja las preguntas, así que nunca es igual.</p>
-      <button id="btn-hero-start" class="btn btn-primary hero-cta">🧠 Empezar por el test de CI →</button>
+      <span class="hero-eyebrow">🔬 Basado en metodología de tests reales</span>
+      <h1>Descubre cómo funciona tu mente</h1>
+      <p class="subtitle">14 tests gratuitos —inteligencia, personalidad y más— con resultados al instante y un análisis por categorías.</p>
+      <button id="btn-hero-start" class="btn btn-primary hero-cta">Empezar por el test de CI →</button>
+
+      <ul class="trust-row">
+        <li>⚡ Resultados al momento</li>
+        <li>🔒 Sin registro</li>
+        <li>🆓 100% gratis</li>
+        <li>🔁 Preguntas que no se repiten</li>
+      </ul>
     </header>
 
     <div id="test-grid" class="test-grid"></div>
@@ -36,6 +51,32 @@
       </div>
       <button id="btn-open-report" class="btn btn-primary">Ver / enviar informe ✉️</button>
     </div>
+
+    <section class="feature-band" aria-label="Cómo funciona">
+      <h2 class="band-title">Diseñado como un test de verdad</h2>
+      <div class="feature-grid">
+        <div class="feature">
+          <span class="feature-icon">🎯</span>
+          <h3>Puntuación ponderada</h3>
+          <p>Acertar preguntas difíciles vale más, igual que en los tests basados en teoría de respuesta al ítem.</p>
+        </div>
+        <div class="feature">
+          <span class="feature-icon">⏱️</span>
+          <h3>La velocidad cuenta</h3>
+          <p>La rapidez suma puntos: la velocidad mental correlaciona con la inteligencia (Jensen, 2006).</p>
+        </div>
+        <div class="feature">
+          <span class="feature-icon">📊</span>
+          <h3>Escala 40–160</h3>
+          <p>Estimación de CI con las bandas de clasificación de la escala Wechsler (media 100).</p>
+        </div>
+        <div class="feature">
+          <span class="feature-icon">🔀</span>
+          <h3>Nunca igual</h3>
+          <p>Muestreo equilibrado y preguntas generadas al vuelo: cada intento es distinto.</p>
+        </div>
+      </div>
+    </section>
 
     <p class="disclaimer disclaimer-global">
       ⚠️ Todos los tests son de carácter recreativo y orientativo. No son instrumentos
@@ -188,7 +229,11 @@
 
 </main>
 
-<footer class="site-footer">Hecho con 🧠 · Batería de tests recreativos</footer>
+<footer class="site-footer">
+  <div class="footer-brand"><span class="brand-mark">🧠</span> Mente<span class="brand-accent">Lab</span></div>
+  <p class="footer-note">Tests recreativos y orientativos con fines de entretenimiento. No constituyen un diagnóstico ni una evaluación psicológica profesional.</p>
+  <p class="footer-meta">Hecho con 🧠 · Datos procesados en tu navegador · Sin registro</p>
+</footer>
 
 <script src="data.js"></script>
 <script src="script.js"></script>
