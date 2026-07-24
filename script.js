@@ -196,11 +196,32 @@
   //   ítems por rasgo en cada intento, para que el perfil sea comparable y fiable).
   function selectQuestions(t) {
     if (t.mix) {
-      let picked = [];
+      // Candidatos: banco curado + variantes generadas al vuelo (casi infinitas).
+      let candidates = t.pool.slice();
+      if (t.generators && t.generators.length) {
+        const target = t.genPerRun || t.pick * 3;
+        for (let i = 0, guard = 0; i < target && guard < target * 8; guard++) {
+          try {
+            const q = t.generators[Math.floor(Math.random() * t.generators.length)]();
+            if (q && q.options && q.options.length === 4) { candidates.push(q); i++; }
+          } catch (_) { /* ignora un generador que falle */ }
+        }
+      }
+      // Deduplicar por enunciado (evita ver dos veces la misma variante).
+      const seen = new Set();
+      candidates = candidates.filter((q) => (seen.has(q.text) ? false : (seen.add(q.text), true)));
+      // Muestreo estratificado por dificultad según el mix.
+      const picked = [];
+      const used = new Set();
       Object.keys(t.mix).forEach((d) => {
-        const tier = shuffle(t.pool.filter((q) => (q.difficulty || 1) === Number(d)));
-        picked = picked.concat(tier.slice(0, t.mix[d]));
+        const tier = shuffle(candidates.filter((q) => (q.difficulty || 1) === Number(d)));
+        tier.slice(0, t.mix[d]).forEach((q) => { picked.push(q); used.add(q); });
       });
+      if (picked.length < t.pick) {
+        shuffle(candidates.filter((q) => !used.has(q)))
+          .slice(0, t.pick - picked.length)
+          .forEach((q) => picked.push(q));
+      }
       return shuffle(picked);
     }
     if (t.type === 'scale') {

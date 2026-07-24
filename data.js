@@ -29,6 +29,65 @@
     'Muy a menudo'
   ];
 
+  /* ============================================================
+   * GENERADORES DE PREGUNTAS (variantes procedurales infinitas)
+   * Cada generador es un "tipo" de pregunta que produce una variante
+   * distinta cada vez (números y datos al azar), de modo que prácticamente
+   * nunca se repiten. Se mezclan con los bancos curados.
+   * ============================================================ */
+  function rnd(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
+  function one(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+  function mix4(arr) {
+    const a = arr.slice();
+    for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; }
+    return a;
+  }
+  function cap(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
+
+  // Pregunta de respuesta numérica con 3 distractores plausibles y únicos.
+  function numQ(category, text, correct, explanation, difficulty) {
+    const spread = Math.max(3, Math.round(Math.abs(correct) * 0.2) + 2);
+    const set = new Set([correct]);
+    let guard = 0;
+    while (set.size < 4 && guard < 80) {
+      guard++;
+      const d = correct + rnd(1, spread) * (Math.random() < 0.5 ? -1 : 1);
+      if (d >= 0 && d !== correct) set.add(d);
+    }
+    let up = correct + 1;
+    while (set.size < 4) { if (up >= 0 && up !== correct) set.add(up); up++; }
+    const opts = mix4([...set]).slice(0, 4);
+    if (!opts.includes(correct)) opts[0] = correct;
+    return { category, text, options: opts.map(String), correct: opts.indexOf(correct), explanation, difficulty };
+  }
+
+  // Pregunta de opción con respuestas de texto.
+  function txtQ(category, text, correct, wrongs, explanation, difficulty) {
+    const opts = mix4([correct, ...wrongs]).slice(0, 4);
+    if (!opts.includes(correct)) opts[0] = correct;
+    return { category, text, options: opts, correct: opts.indexOf(correct), explanation, difficulty };
+  }
+
+  const GEN = {
+    mult: (c) => { const a = rnd(3, 12), b = rnd(3, 12); return numQ(c, `¿Cuánto es ${a} × ${b}?`, a * b, `${a} × ${b} = ${a * b}.`, 1); },
+    add: (c) => { const a = rnd(23, 199), b = rnd(23, 199); return numQ(c, `¿Cuánto es ${a} + ${b}?`, a + b, `${a} + ${b} = ${a + b}.`, 1); },
+    sub: (c) => { const a = rnd(60, 300), b = rnd(15, a - 5); return numQ(c, `¿Cuánto es ${a} − ${b}?`, a - b, `${a} − ${b} = ${a - b}.`, 1); },
+    div: (c) => { const b = rnd(2, 12), q = rnd(2, 12); return numQ(c, `¿Cuánto es ${b * q} ÷ ${b}?`, q, `${b * q} ÷ ${b} = ${q}.`, 1); },
+    half: (c) => { const n = rnd(10, 60) * 2; return numQ(c, `¿Cuánto es la mitad de ${n}?`, n / 2, `${n} ÷ 2 = ${n / 2}.`, 1); },
+    dbl: (c) => { const n = rnd(6, 80); return numQ(c, `¿Cuál es el doble de ${n}?`, n * 2, `${n} × 2 = ${n * 2}.`, 1); },
+    sq: (c) => { const n = rnd(4, 15); return numQ(c, `¿Cuánto es ${n}²?`, n * n, `${n} × ${n} = ${n * n}.`, 2); },
+    pct: (c) => { const p = one([10, 20, 25, 50, 5, 75]), base = rnd(2, 20) * 20; return numQ(c, `¿Cuánto es el ${p}% de ${base}?`, base * p / 100, `El ${p}% de ${base} es ${base * p / 100}.`, 2); },
+    seqA: (c) => { const s = rnd(1, 9), st = rnd(2, 9), q = [s, s + st, s + 2 * st, s + 3 * st]; return numQ(c, `Serie: ${q.join(', ')}, ?`, s + 4 * st, `Se suma ${st} cada vez: ${q[3]} + ${st} = ${s + 4 * st}.`, 1); },
+    seqG: (c) => { const s = rnd(1, 5), r = one([2, 3]), q = [s, s * r, s * r * r, s * r * r * r]; return numQ(c, `Serie: ${q.join(', ')}, ?`, s * Math.pow(r, 4), `Cada término se multiplica por ${r}: ${q[3]} × ${r} = ${s * Math.pow(r, 4)}.`, 2); },
+    seqGrow: (c) => { const s = rnd(1, 6); let d = rnd(2, 5), cur = s; const q = [s]; for (let i = 0; i < 3; i++) { cur += d; q.push(cur); d++; } return numQ(c, `Serie: ${q.join(', ')}, ?`, cur + d, `Las diferencias crecen de uno en uno: sigue ${cur + d}.`, 2); },
+    fast: (c) => { const a = rnd(2, 9), b = rnd(2, 9); return numQ(c, `Rápido: ${a} × ${b} = ?`, a * b, `${a} × ${b} = ${a * b}.`, 1); },
+    missing: (c) => { const s = rnd(1, 9), st = rnd(2, 7), full = [s, s + st, s + 2 * st, s + 3 * st, s + 4 * st], idx = rnd(1, 3), sh = full.map((v, i) => (i === idx ? '__' : v)); return numQ(c, `¿Qué número falta? ${sh.join(', ')}`, full[idx], `La serie va de ${st} en ${st}.`, 1); },
+    count: (c) => { const dg = rnd(1, 9), arr = []; for (let i = 0; i < 10; i++) arr.push(rnd(0, 9)); let i1 = rnd(0, 9), i2 = rnd(0, 9); while (i2 === i1) i2 = rnd(0, 9); arr[i1] = dg; arr[i2] = dg; const n = arr.filter((x) => x === dg).length; return numQ(c, `¿Cuántos «${dg}» hay en la serie? ${arr.join(' ')}`, n, `El ${dg} aparece ${n} veces.`, 2); },
+    age: (c) => { const y = rnd(4, 25), tot = y * 3; return numQ(c, `Una persona tiene el doble de años que otra y juntas suman ${tot}. ¿Cuántos años tiene la más joven?`, y, `Si la joven tiene x y la otra 2x, entonces 3x = ${tot}, x = ${y}.`, 2); },
+    order: (c) => { const n = mix4(['Ana', 'Beto', 'Carla', 'Dani', 'Eva', 'Leo', 'Nora', 'Iván']).slice(0, 3); return txtQ(c, `${n[0]} es más rápido que ${n[1]}, y ${n[1]} más rápido que ${n[2]}. ¿Quién es el más lento?`, n[2], [n[0], n[1], 'Todos igual'], `De rápido a lento: ${n[0]}, ${n[1]}, ${n[2]}.`, 2); },
+    day: (c) => { const d = ['lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado', 'domingo'], s = rnd(0, 6), a = rnd(2, 6), r = d[(s + a) % 7]; return txtQ(c, `Si hoy es ${d[s]}, ¿qué día será dentro de ${a} días?`, cap(r), mix4(d.filter((x) => x !== r)).slice(0, 3).map(cap), `Contando ${a} días desde el ${d[s]}.`, 2); }
+  };
+
   const TESTS = {
 
     /* ================= TEST DE CI (quiz) ================= */
@@ -658,6 +717,22 @@
     }
 
   };
+
+  // Adjuntar generadores procedurales (preguntas casi infinitas que no se repiten).
+  // `genPerRun` = cuántas variantes frescas se generan y mezclan con el banco curado.
+  TESTS.numerico.generators = ['mult', 'add', 'sub', 'div', 'half', 'dbl', 'sq', 'pct', 'seqA', 'seqG', 'seqGrow']
+    .map((k) => () => GEN[k]('Numérico'));
+  TESTS.numerico.genPerRun = 50;
+
+  TESTS.atencion.generators = [() => GEN.fast('Atención'), () => GEN.missing('Atención'), () => GEN.count('Atención')];
+  TESTS.atencion.genPerRun = 24;
+
+  TESTS.logico.generators = [() => GEN.age('Lógico'), () => GEN.order('Lógico'), () => GEN.day('Lógico')];
+  TESTS.logico.genPerRun = 18;
+
+  // Nota: el CI NO usa generadores a propósito, para mantener el equilibrio entre
+  // sus categorías (lógica, matemáticas, patrones y verbal). Su banco curado de 86
+  // preguntas ya da variedad de sobra.
 
   // Orden en que se muestran en la portada (el CI va primero).
   const TEST_ORDER = [

@@ -141,6 +141,12 @@ vacío, output `/`. En ese modo la carpeta `functions/` se enruta sola y `worker
     ítems por rasgo en cada intento), para que los perfiles sean comparables y fiables.
 - **Banco ampliado**: el CI tiene 86 preguntas y muestra 25 (12 min); el resto de quizzes
   también tienen bancos mayores que su `pick` para que roten en cada intento.
+- **Preguntas casi infinitas (generadores)**: los tests de números, atención y lógica usan
+  *generadores procedurales* (plantillas con números/datos al azar) que crean una variante
+  distinta cada vez, así que prácticamente **nunca se repiten** (dos intentos de numérico
+  solapan ~8%). Se definen en `data.js` (objeto `GEN`) y se mezclan con el banco curado en
+  `selectQuestions`. El CI no los usa a propósito, para conservar el equilibrio entre sus
+  categorías.
 - **Optimizado para conversión**: CTA directo al test de CI en la portada, botón de
   "siguiente test" al terminar (encadena la batería) y metadatos Open Graph para compartir.
 - **Diseño responsive (móvil, tablet y PC)**: la portada usa varias columnas en pantallas
