@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Batería de Tests Psicológicos | Personalidad, CI y más</title>
+<meta name="description" content="14 tests gratis: coeficiente intelectual, personalidad Big Five, inteligencia emocional, atención, cultura general y más. Con resultados al momento e informe descargable.">
+<meta property="og:title" content="Batería de Tests Psicológicos — mide tu CI y tu personalidad">
+<meta property="og:description" content="14 tests gratis con resultados al momento: CI, personalidad, inteligencia emocional, atención y más. Cada intento cambia las preguntas.">
+<meta property="og:type" content="website">
+<meta name="theme-color" content="#0f1120">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🧠</text></svg>">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="bg-decor" aria-hidden="true"></div>
+
+<!-- Barra de marca superior -->
+<div class="topbar">
+  <div class="topbar-inner">
+    <a class="brand" href="/" style="text-decoration:none;color:inherit;"><span class="brand-mark">🧠</span> Mente<span class="brand-accent">Lab</span></a>
+    <a class="brand-tag" href="/" style="color:var(--accent-2);">← Test de CI (portada)</a>
+  </div>
+</div>
+
+<main class="app">
+
+  <!-- ============ PORTADA / HUB ============ -->
+  <section id="screen-hub" class="screen active">
+    <header class="hub-header">
+      <span class="hero-eyebrow">🔬 Basado en metodología de tests reales</span>
+      <h1>Descubre cómo funciona tu mente</h1>
+      <p class="subtitle">14 tests gratuitos —inteligencia, personalidad y más— con resultados al instante y un análisis por categorías.</p>
+      <button id="btn-hero-start" class="btn btn-primary hero-cta">Empezar por el test de CI →</button>
+
+      <ul class="trust-row">
+        <li>⚡ Resultados al momento</li>
+        <li>🔒 Sin registro</li>
+        <li>🆓 100% gratis</li>
+        <li>🔁 Preguntas que no se repiten</li>
+      </ul>
+    </header>
+
+    <div id="test-grid" class="test-grid"></div>
+
+    <div id="report-bar" class="report-bar hidden">
+      <div class="report-info">
+        <strong>📋 Informe de resultados</strong>
+        <span id="report-count" class="report-count">0 tests completados</span>
+      </div>
+      <button id="btn-open-report" class="btn btn-primary">Ver / enviar informe ✉️</button>
+    </div>
+
+    <section class="feature-band" aria-label="Cómo funciona">
+      <h2 class="band-title">Diseñado como un test de verdad</h2>
+      <div class="feature-grid">
+        <div class="feature">
+          <span class="feature-icon">🎯</span>
+          <h3>Puntuación ponderada</h3>
+          <p>Acertar preguntas difíciles vale más, igual que en los tests basados en teoría de respuesta al ítem.</p>
+        </div>
+        <div class="feature">
+          <span class="feature-icon">⏱️</span>
+          <h3>La velocidad cuenta</h3>
+          <p>La rapidez suma puntos: la velocidad mental correlaciona con la inteligencia (Jensen, 2006).</p>
+        </div>
+        <div class="feature">
+          <span class="feature-icon">📊</span>
+          <h3>Escala 40–160</h3>
+          <p>Estimación de CI con las bandas de clasificación de la escala Wechsler (media 100).</p>
+        </div>
+        <div class="feature">
+          <span class="feature-icon">🔀</span>
+          <h3>Nunca igual</h3>
+          <p>Muestreo equilibrado y preguntas generadas al vuelo: cada intento es distinto.</p>
+        </div>
+      </div>
+    </section>
+
+    <p class="disclaimer disclaimer-global">
+      ⚠️ Todos los tests son de carácter recreativo y orientativo. No son instrumentos
+      clínicos ni sustituyen una evaluación psicológica profesional.
+    </p>
+  </section>
+
+  <!-- ============ INTRO DE UN TEST ============ -->
+  <section id="screen-intro" class="screen">
+    <div class="card">
+      <button class="back-link" id="btn-intro-back">← Volver</button>
+      <div id="intro-icon" class="brain-icon">🧠</div>
+      <h1 id="intro-title">Test</h1>
+      <p id="intro-desc" class="subtitle"></p>
+
+      <div class="info-grid" id="intro-stats">
+        <div class="info-item">
+          <span id="intro-count" class="info-num">20</span>
+          <span class="info-label">Preguntas</span>
+        </div>
+        <div class="info-item" id="intro-time-item">
+          <span id="intro-time" class="info-num">10:00</span>
+          <span class="info-label">Minutos</span>
+        </div>
+        <div class="info-item">
+          <span id="intro-type" class="info-num">Quiz</span>
+          <span class="info-label">Formato</span>
+        </div>
+      </div>
+
+      <ul id="intro-rules" class="rules"></ul>
+
+      <p id="intro-disclaimer" class="disclaimer"></p>
+
+      <input id="player-name" type="text" placeholder="Tu nombre (opcional)" maxlength="40" autocomplete="off">
+
+      <button id="btn-start" class="btn btn-primary">Comenzar ▶</button>
+    </div>
+  </section>
+
+  <!-- ============ TEST EN CURSO ============ -->
+  <section id="screen-quiz" class="screen">
+    <div class="quiz-header">
+      <div class="progress-wrap">
+        <div class="progress-bar"><div id="progress-fill" class="progress-fill"></div></div>
+        <span id="progress-text" class="progress-text">Pregunta 1 / 20</span>
+      </div>
+      <div id="timer" class="timer">10:00</div>
+    </div>
+
+    <div class="card quiz-card">
+      <span id="q-category" class="badge">Categoría</span>
+      <h2 id="q-text" class="q-text">Pregunta</h2>
+      <div id="q-options" class="options"></div>
+    </div>
+
+    <div class="quiz-nav">
+      <button id="btn-prev" class="btn btn-ghost">◀ Anterior</button>
+      <button id="btn-next" class="btn btn-primary">Siguiente ▶</button>
+      <button id="btn-finish" class="btn btn-success hidden">Finalizar ✔</button>
+    </div>
+  </section>
+
+  <!-- ============ RESULTADO ============ -->
+  <section id="screen-result" class="screen">
+    <div class="card result-card">
+      <div id="result-icon" class="result-icon">🎯</div>
+      <h1 id="result-title">Resultado</h1>
+      <p id="result-name" class="subtitle"></p>
+
+      <div class="iq-score-wrap">
+        <div class="iq-score" id="result-headline">—</div>
+        <div class="iq-label" id="result-headline-label">Resultado</div>
+        <div id="result-tier" class="iq-tier">—</div>
+      </div>
+
+      <p id="result-speed" class="speed-line hidden"></p>
+
+      <div id="result-stats" class="info-grid"></div>
+
+      <h3 class="breakdown-title" id="breakdown-title">Desglose</h3>
+      <div id="category-breakdown" class="breakdown"></div>
+
+      <p id="result-message" class="result-message"></p>
+
+      <div class="share-box">
+        <span class="share-title">🔥 Reta a tus amigos a superarte</span>
+        <button id="btn-share" class="btn btn-share">📲 Compartir mi resultado</button>
+        <button id="btn-share-img" class="btn btn-ghost btn-share-img">🖼️ Descargar imagen para redes</button>
+        <div class="share-links">
+          <a id="share-wa" class="share-link" target="_blank" rel="noopener">💬 WhatsApp</a>
+          <a id="share-x" class="share-link" target="_blank" rel="noopener">𝕏 Publicar</a>
+          <button id="share-copy" class="share-link" type="button">🔗 Copiar</button>
+        </div>
+        <p id="share-status" class="share-status" aria-live="polite"></p>
+      </div>
+
+      <details class="method" id="method-box">
+        <summary>¿Cómo influye el tiempo en la puntuación?</summary>
+        <p>
+          En los tests de <strong>capacidad</strong> (CI, atención, numérico, lógico y
+          cultura), la rapidez suma un bonus acotado, siempre multiplicado por tus aciertos
+          (responder rápido pero mal no puntúa). Se basa en la investigación sobre
+          <em>velocidad mental</em>, que correlaciona con la inteligencia (r ≈ 0,3–0,4):
+          Jensen (2006, <em>Clocking the Mind</em>), Deary, Der &amp; Ford (2001),
+          Sheppard &amp; Vernon (2008); los tests tipo Wechsler (WAIS) también dan bonus
+          por rapidez.
+        </p>
+        <p>
+          Los tests de <strong>personalidad</strong> no tienen cronómetro: el tiempo no
+          influye en el resultado, porque no tendría base científica. Los haces a tu ritmo.
+        </p>
+      </details>
+
+      <p id="result-disclaimer" class="disclaimer"></p>
+
+      <div class="result-actions">
+        <button id="btn-review" class="btn btn-ghost hidden">Ver respuestas</button>
+        <button id="btn-retry" class="btn btn-ghost">Repetir 🔁</button>
+        <button id="btn-result-home" class="btn btn-ghost">Inicio 🏠</button>
+      </div>
+
+      <div id="next-test-wrap" class="next-test hidden">
+        <button id="btn-next-test" class="btn btn-primary">Siguiente test →</button>
+      </div>
+
+      <div id="review-wrap" class="review-wrap hidden"></div>
+    </div>
+  </section>
+
+  <!-- ============ MODAL INFORME / CORREO ============ -->
+  <div id="report-modal" class="modal hidden">
+    <div class="modal-card">
+      <button class="modal-close" id="btn-report-close">✕</button>
+      <h2>📋 Tu informe</h2>
+      <p class="subtitle">Resumen de los tests que has completado en esta sesión.</p>
+
+      <div id="report-summary" class="report-summary"></div>
+
+      <div class="report-email" id="report-email-block">
+        <label for="report-email-input">Recíbelo por correo</label>
+        <input id="report-email-input" type="email" placeholder="tu@correo.com" autocomplete="email">
+        <button id="btn-send-email" class="btn btn-primary">Enviar informe por correo ✉️</button>
+        <p id="report-status" class="report-status"></p>
+      </div>
+
+      <button id="btn-download-report" class="btn btn-ghost">⬇️ Descargar informe (HTML)</button>
+    </div>
+  </div>
+
+</main>
+
+<footer class="site-footer">
+  <div class="footer-brand"><span class="brand-mark">🧠</span> Mente<span class="brand-accent">Lab</span></div>
+  <p class="footer-note">Tests recreativos y orientativos con fines de entretenimiento. No constituyen un diagnóstico ni una evaluación psicológica profesional.</p>
+  <p class="footer-meta">Hecho con 🧠 · Datos procesados en tu navegador · Sin registro</p>
+</footer>
+
+<script src="data.js"></script>
+<script src="script.js"></script>
+</body>
+</html>

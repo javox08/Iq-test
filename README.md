@@ -45,15 +45,43 @@ Al terminar puedes recibir un **informe por correo** (o descargarlo).
 
 ## Estructura
 
+El sitio tiene **dos páginas**:
+
+| Ruta | Qué es |
+|---|---|
+| `/` (`index.html`) | **Portada**: test de IQ/CI de 10 preguntas, autocontenida (HTML + CSS + JS en un archivo), optimizada para SEO, accesibilidad y conversión. |
+| `/bateria.html` | **Batería de 14 tests** (la app completa): CI largo, personalidad, atención, cultura general… con temporizador e informe. |
+
+Ambas se enlazan entre sí (cabecera y pie).
+
 ```
-index.html                  Pantallas (portada, intro, test, resultado, modal informe)
-style.css                   Estilos
+index.html                  PORTADA: test de IQ/CI de 10 preguntas (autocontenida)
+preguntas-ci.json           Banco de preguntas de la portada (reutilizable)
+bateria.html                App de los 14 tests (antes era index.html)
+style.css                   Estilos de la batería
 data.js                     "Base de datos": definición y banco de preguntas de cada test
-script.js                   Motor: baraja, cronómetro, puntuación, informe
+script.js                   Motor de la batería: baraja, cronómetro, puntuación, informe
 functions/api/send-report.js   Handler que envía el correo por Resend
 worker.js                   Punto de entrada del Worker: enruta /api/send-report y sirve lo estático
 wrangler.jsonc              Configuración de Cloudflare Workers (assets + script)
 ```
+
+### Sobre la portada (`index.html`)
+
+Página independiente pensada para captar tráfico de búsqueda ("test de IQ", "test de CI",
+"prueba de inteligencia"):
+
+- 10 preguntas con etiqueta de dificultad y **solución explicada** de cada una.
+- Puntuación **ponderada por dificultad** (22 puntos) → `CI = 70 + (puntos/22) × 60`,
+  comparada con la media poblacional (100). Rango acotado a **70–130** a propósito: con
+  10 ítems no es defendible dar cifras extremas.
+- Accesibilidad: enlace de salto, `role="progressbar"` con ARIA, `aria-live`, gestión del
+  foco, foco visible, radios navegables con teclado y tema claro de alto contraste.
+- SEO: `title` + meta description (155 car.), jerarquía `h1`/`h2`/`h3`, FAQ con JSON-LD
+  (`FAQPage` y `WebApplication`), canonical y Open Graph.
+- Privacidad: no se recoge ningún dato; todo se procesa en el navegador.
+
+> Al cambiar de dominio, actualiza `<link rel="canonical">` en `index.html`.
 
 ## Probar en local (sin correo)
 
