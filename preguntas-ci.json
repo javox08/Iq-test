@@ -1,0 +1,139 @@
+{
+  "$comentario": "Banco de preguntas del test de CI de test-ci.html. Formato reutilizable: si mueves la lógica a un archivo JS externo, puedes cargar este JSON con fetch() en lugar de tener las preguntas en el HTML.",
+  "version": 1,
+  "idioma": "es",
+  "escala": {
+    "media": 100,
+    "desviacion": 15,
+    "minimo": 70,
+    "maximo": 130,
+    "formula": "CI = redondear(70 + (puntos_obtenidos / puntos_totales) * 60)",
+    "nota": "Rango acotado a propósito: con 10 ítems no es honesto dar cifras extremas."
+  },
+  "pesos": { "facil": 1, "media": 2, "dificil": 3 },
+  "puntosTotales": 22,
+  "preguntas": [
+    {
+      "id": "q1",
+      "categoria": "Series numéricas",
+      "dificultad": "facil",
+      "peso": 1,
+      "enunciado": "¿Qué número continúa la serie? 3, 6, 12, 24, …",
+      "opciones": ["30", "36", "48", "60"],
+      "correcta": 2,
+      "solucion": "48. Cada término es el doble del anterior."
+    },
+    {
+      "id": "q2",
+      "categoria": "Analogías verbales",
+      "dificultad": "facil",
+      "peso": 1,
+      "enunciado": "Pluma es a escribir como tijeras es a…",
+      "opciones": ["Papel", "Cortar", "Metal", "Coser"],
+      "correcta": 1,
+      "solucion": "Cortar. La relación es objeto → función."
+    },
+    {
+      "id": "q3",
+      "categoria": "Series numéricas",
+      "dificultad": "media",
+      "peso": 2,
+      "enunciado": "¿Qué número continúa la serie? 5, 6, 12, 13, 26, …",
+      "opciones": ["27", "39", "52", "32"],
+      "correcta": 0,
+      "solucion": "27. Se alternan dos operaciones: +1 y ×2."
+    },
+    {
+      "id": "q4",
+      "categoria": "Lógica deductiva",
+      "dificultad": "media",
+      "peso": 2,
+      "enunciado": "Todos los músicos son pacientes. Algunos pacientes son madrugadores. ¿Se puede concluir con certeza que algunos músicos son madrugadores?",
+      "opciones": [
+        "Sí, necesariamente",
+        "No, no se puede concluir",
+        "Sí, pero solo si hay más músicos que madrugadores",
+        "No, porque ningún músico madruga"
+      ],
+      "correcta": 1,
+      "solucion": "No se puede concluir: que algunos pacientes madruguen no garantiza que alguno de ellos sea músico."
+    },
+    {
+      "id": "q5",
+      "categoria": "Razonamiento abstracto",
+      "dificultad": "media",
+      "peso": 2,
+      "enunciado": "Observa la secuencia de figuras. ¿Dónde estará el punto negro en la cuarta figura?",
+      "figura": {
+        "tipo": "svg-en-linea",
+        "alt": "Secuencia de tres cuadrados con un punto negro que gira en el sentido de las agujas del reloj",
+        "descripcionLarga": "Primer cuadrado: punto arriba a la izquierda. Segundo cuadrado: punto arriba a la derecha. Tercer cuadrado: punto abajo a la derecha. El cuarto cuadrado está vacío con un signo de interrogación."
+      },
+      "opciones": [
+        "Arriba a la izquierda",
+        "Arriba a la derecha",
+        "Abajo a la derecha",
+        "Abajo a la izquierda"
+      ],
+      "correcta": 3,
+      "solucion": "Abajo a la izquierda. El punto gira en el sentido de las agujas del reloj."
+    },
+    {
+      "id": "q6",
+      "categoria": "Proporciones y porcentajes",
+      "dificultad": "media",
+      "peso": 2,
+      "enunciado": "Un abrigo cuesta 90 € después de un descuento del 25 %. ¿Cuál era su precio original?",
+      "opciones": ["105 €", "112,50 €", "120 €", "135 €"],
+      "correcta": 2,
+      "solucion": "120 €. Si 90 € es el 75 % del precio original, entonces 90 ÷ 0,75 = 120."
+    },
+    {
+      "id": "q7",
+      "categoria": "Series numéricas",
+      "dificultad": "dificil",
+      "peso": 3,
+      "enunciado": "¿Qué número continúa la serie? 2, 3, 5, 8, 13, …",
+      "opciones": ["18", "20", "21", "26"],
+      "correcta": 2,
+      "solucion": "21. Cada término es la suma de los dos anteriores (8 + 13)."
+    },
+    {
+      "id": "q8",
+      "categoria": "Razonamiento cuantitativo",
+      "dificultad": "dificil",
+      "peso": 3,
+      "enunciado": "Si 4 impresoras imprimen 4 folletos en 4 minutos, ¿cuántos minutos tardarán 8 impresoras en imprimir 8 folletos?",
+      "opciones": ["2 minutos", "4 minutos", "8 minutos", "16 minutos"],
+      "correcta": 1,
+      "solucion": "4 minutos. Cada impresora tarda 4 minutos por folleto, así que 8 impresoras hacen 8 folletos en el mismo tiempo."
+    },
+    {
+      "id": "q9",
+      "categoria": "Clasificación y abstracción",
+      "dificultad": "dificil",
+      "peso": 3,
+      "enunciado": "¿Cuál de estos elementos no pertenece al grupo?",
+      "opciones": ["Cubo", "Esfera", "Cilindro", "Cuadrado"],
+      "correcta": 3,
+      "solucion": "Cuadrado: es una figura plana (2D) mientras que las demás son cuerpos geométricos (3D)."
+    },
+    {
+      "id": "q10",
+      "categoria": "Series alfanuméricas",
+      "dificultad": "dificil",
+      "peso": 3,
+      "enunciado": "¿Qué par continúa la serie? A1, C2, E3, G4, …",
+      "opciones": ["H5", "I4", "I5", "J5"],
+      "correcta": 2,
+      "solucion": "I5. Las letras avanzan de dos en dos (A, C, E, G, I) y los números de uno en uno."
+    }
+  ],
+  "bandas": [
+    { "hasta": 84, "etiqueta": "Por debajo de la media" },
+    { "hasta": 94, "etiqueta": "Media baja" },
+    { "hasta": 105, "etiqueta": "En la media" },
+    { "hasta": 115, "etiqueta": "Media alta" },
+    { "hasta": 130, "etiqueta": "Por encima de la media" }
+  ]
+}
